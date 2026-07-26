@@ -1,0 +1,8 @@
+services:
+  frontend:
+    ports:
+      - "${HTTPS_PORT:-443}:8443"
+    volumes:
+      - ./frontend/frontend.tls.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${TLS_CERT_DIR:-./certs}/purocole.crt:/etc/nginx/tls/purocole.crt:ro
+      - ${TLS_CERT_DIR:-./certs}/purocole.key:/etc/nginx/tls/purocole.key:ro
