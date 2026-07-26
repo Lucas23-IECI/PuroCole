@@ -12,6 +12,10 @@ export const PERMISSIONS = {
   USERS_MANAGE: 'users.manage',
   SETTINGS_MANAGE: 'settings.manage',
   AUDIT_VIEW: 'audit.view',
+  FOOD_VIEW: 'food.view',
+  FOOD_REGISTER: 'food.register',
+  FOOD_MANAGE: 'food.manage',
+  FOOD_REPORTS: 'food.reports',
 };
 
 export const ADMIN_MODULE_PERMISSIONS = [
@@ -24,6 +28,10 @@ export const ADMIN_MODULE_PERMISSIONS = [
   PERMISSIONS.USERS_MANAGE,
   PERMISSIONS.SETTINGS_MANAGE,
   PERMISSIONS.AUDIT_VIEW,
+  PERMISSIONS.FOOD_VIEW,
+  PERMISSIONS.FOOD_REGISTER,
+  PERMISSIONS.FOOD_MANAGE,
+  PERMISSIONS.FOOD_REPORTS,
 ];
 
 export const hasPermission = (user, permission) => Array.isArray(user?.permissions)

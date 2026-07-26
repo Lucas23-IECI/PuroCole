@@ -27,6 +27,7 @@ const ICONS = {
   settings: Settings2,
   'user-cog': UserCog,
   users: Users,
+  utensils: UtensilsCrossed,
 };
 
 const RESERVED_ICONS = {

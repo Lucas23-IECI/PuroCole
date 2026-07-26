@@ -74,6 +74,8 @@ Produce:
 
 ## Módulo Alimentación
 
+Estado actual: núcleo operacional activo. Importación PAE, terminal dedicado y reportes finales continúan en desarrollo.
+
 Depende de:
 
 - Estudiantes y matrículas.
@@ -89,6 +91,8 @@ Produce:
 - Duplicados prevenidos.
 - Diferencias entre beneficiarios y entregas.
 - Historial y reportes.
+
+Contrato y estado detallado: `FOOD_MODULE.md`.
 
 ## Módulo Retiros
 

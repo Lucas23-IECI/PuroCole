@@ -97,6 +97,172 @@
   color: var(--ds-primary-strong);
 }
 
+.student-operational {
+  margin-bottom: 20px;
+  border: 1px solid var(--ds-border);
+  border-top: 4px solid #175f8a;
+  background: var(--ds-surface);
+}
+
+.student-operational__heading,
+.student-timeline__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 17px 18px;
+  border-bottom: 1px solid var(--ds-border);
+}
+
+.student-operational__heading > div,
+.student-timeline__heading > div {
+  display: grid;
+  gap: 3px;
+}
+
+.student-operational__heading > div > span,
+.student-timeline__heading > div > span {
+  color: #9a5b16;
+  font-size: 0.65rem;
+  font-weight: 850;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.student-operational__heading h4,
+.student-timeline__heading h4 {
+  margin: 0;
+  color: var(--ds-text);
+  font-size: 1rem;
+}
+
+.student-operational__status {
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #fff0f0;
+  color: #a92f3a;
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
+.student-operational__status[data-active] {
+  background: #e4f2ea;
+  color: #176d4f;
+}
+
+.student-operational__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.student-operational__metrics article {
+  display: grid;
+  min-width: 0;
+  min-height: 105px;
+  align-content: center;
+  gap: 5px;
+  padding: 14px;
+  color: #175f8a;
+}
+
+.student-operational__metrics article + article {
+  border-left: 1px solid var(--ds-border);
+}
+
+.student-operational__metrics span {
+  overflow: hidden;
+  color: var(--ds-muted);
+  font-size: 0.65rem;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-operational__metrics strong {
+  color: var(--ds-text);
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  line-height: 1;
+}
+
+.student-timeline {
+  margin-bottom: 20px;
+  border: 1px solid var(--ds-border);
+  background: var(--ds-surface);
+}
+
+.student-timeline__heading small {
+  color: var(--ds-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.student-timeline ol {
+  max-height: 360px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.student-timeline li {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 15px 16px;
+  border-bottom: 1px solid var(--ds-border);
+}
+
+.student-timeline li:last-child { border-bottom: 0; }
+.student-timeline li[data-state="anulado"] { opacity: 0.72; }
+
+.student-timeline__marker {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e4eef4;
+  color: #175f8a;
+}
+
+.student-timeline li[data-module="food"] .student-timeline__marker {
+  background: #f4e9d9;
+  color: #9a5b16;
+}
+
+.student-timeline li > div {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.student-timeline li strong { color: var(--ds-text); font-size: 0.8rem; }
+.student-timeline li p { margin: 0; color: var(--ds-muted); font-size: 0.71rem; }
+.student-timeline li small { color: var(--ds-muted); font-size: 0.65rem; }
+.student-timeline li > i {
+  align-self: start;
+  color: var(--ds-muted);
+  font-size: 0.61rem;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.student-timeline__empty {
+  display: flex;
+  min-height: 110px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
+  color: var(--ds-muted);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
 @media (max-width: 760px) {
   .students-page {
     padding: 12px;
@@ -234,6 +400,28 @@
 
   .student-detail-close {
     margin: -10px -4px 6px auto;
+  }
+
+  .student-operational__metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .student-operational__metrics article:nth-child(3) {
+    border-left: 0;
+    border-top: 1px solid var(--ds-border);
+  }
+
+  .student-operational__metrics article:nth-child(4) {
+    border-top: 1px solid var(--ds-border);
+  }
+
+  .student-timeline li {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .student-timeline li > i {
+    grid-column: 2;
+    justify-self: start;
   }
 }
 

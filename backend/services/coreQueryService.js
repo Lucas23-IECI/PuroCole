@@ -53,9 +53,50 @@ const getStudentDetails = async (queryable, studentId) => {
   return result.rows[0] || null;
 };
 
+const getStudentOperationalSummary = async (queryable, studentId) => {
+  const result = await queryable.query(`
+    SELECT
+      COUNT(*) FILTER (
+        WHERE r.tipo_registro = 'Entrada' AND r.anulado = false
+      )::int AS ingresos,
+      COUNT(*) FILTER (
+        WHERE r.tipo_registro = 'Entrada' AND r.estado = 'Atrasado' AND r.anulado = false
+      )::int AS atrasos,
+      COUNT(*) FILTER (
+        WHERE r.tipo_registro = 'Entrada' AND r.estado = 'Atrasado'
+          AND r.justificado = true AND r.anulado = false
+      )::int AS atrasos_justificados,
+      MAX(r.fecha)::text AS ultimo_ingreso,
+      (
+        SELECT COUNT(*)::int
+        FROM food_registrations fr
+        WHERE fr.id_alumno = $1 AND fr.voided = false
+      ) AS entregas_alimentacion,
+      EXISTS (
+        SELECT 1
+        FROM food_beneficiaries fb
+        WHERE fb.id_alumno = $1
+          AND fb.active = true
+          AND fb.valid_from <= CURRENT_DATE
+          AND (fb.valid_until IS NULL OR fb.valid_until >= CURRENT_DATE)
+      ) AS beneficiario_alimentacion
+    FROM attendance_registrations r
+    WHERE r.id_alumno = $1
+  `, [studentId]);
+  return result.rows[0] || {
+    ingresos: 0,
+    atrasos: 0,
+    atrasos_justificados: 0,
+    ultimo_ingreso: null,
+    entregas_alimentacion: 0,
+    beneficiario_alimentacion: false
+  };
+};
+
 module.exports = {
   STUDENT_PUBLIC_FIELDS,
   getStudentDetails,
+  getStudentOperationalSummary,
   listCourses,
   listStudents,
   searchStudents

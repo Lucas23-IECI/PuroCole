@@ -86,6 +86,22 @@ Este archivo registra decisiones de producto y arquitectura que deben sobrevivir
 - Decisión: mantener inicialmente una instalación Docker por establecimiento.
 - Consecuencia: la evolución a arquitectura SaaS se decidirá con evidencia de los pilotos.
 
+## DEC-013 — Línea temporal referencial e idempotente
+
+- Fecha: 26 de julio de 2026.
+- Estado: aceptada.
+- Decisión: cada módulo conserva su tabla funcional y publica versiones mínimas en `eventos_operacionales`.
+- Motivo: obtener una ficha compartida sin convertir una tabla genérica en un modelo que deba resolver todas las reglas de dominio.
+- Consecuencias: mutación, evento y auditoría comparten transacción; las correcciones agregan versiones y una clave única tolera reintentos.
+
+## DEC-014 — Alimentación se integra sobre el núcleo común
+
+- Fecha: 26 de julio de 2026.
+- Estado: aceptada.
+- Decisión: implementar Alimentación dentro de PuroCole, sin copiar autenticación, estudiantes, usuarios, navegación ni auditoría de la aplicación fuente.
+- Motivo: el contrato de eventos y la ficha ya permiten validar el segundo módulo real.
+- Consecuencias: beneficiarios y entregas tienen tablas propias; un beneficio nunca se infiere solo desde la credencial; no se introduce ficha clínica.
+
 ## Cómo agregar una decisión
 
 Registrar:

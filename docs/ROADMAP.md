@@ -59,7 +59,7 @@ Salida:
 
 ## Fase 3 — Núcleo modular
 
-Estado: en ejecución; subfases 3.0 y 3.1 completadas. La primera extracción de 3.2 está aprobada y continúa el desacople del núcleo.
+Estado: en ejecución; 3.0, 3.1, 3.3, 3.4 y la aceptación automatizada de 3.5 están completadas. La extracción incremental 3.2 continúa.
 
 Plan detallado: `PHASE_3_PLAN.md`.
 
@@ -79,15 +79,17 @@ Salida:
 
 ## Fase 4 — Alimentación
 
+Estado: en ejecución; núcleo operacional completado y validado el 26 de julio de 2026.
+
 Entregables:
 
-- Beneficiarios.
+- Beneficiarios. Completado en su flujo manual.
 - Importación PAE.
-- Servicios de alimentación.
-- Prevención de duplicados.
+- Servicios de alimentación. Completado.
+- Prevención de duplicados. Completado.
 - Alertas alimentarias mínimas.
-- Terminal y reportes.
-- Integración con la línea temporal.
+- Terminal y reportes. API y portal inicial completados; terminal de lector y reportes finales pendientes.
+- Integración con la línea temporal. Completado.
 
 Salida:
 

@@ -6,6 +6,7 @@ import './styles/institutional.css'
 import './styles/design-system.css'
 import './styles/punctuality.css'
 import './styles/release-notes.css'
+import './styles/food.css'
 import { AuthProvider, AuthContext } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
 import App from './App.jsx'
@@ -28,6 +29,7 @@ const AuditoriaAdmin = lazy(() => import('./AuditoriaAdmin.jsx'))
 const AnaliticasAdmin = lazy(() => import('./AnaliticasAdmin.jsx'))
 const ChangePassword = lazy(() => import('./ChangePassword.jsx'))
 const PunctualitySettings = lazy(() => import('./PunctualitySettings.jsx'))
+const FoodDashboard = lazy(() => import('./FoodDashboard.jsx'))
 
 applyBrandTheme()
 
@@ -95,6 +97,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/admin/auditoria" element={<ProtectedRoute permission={PERMISSIONS.AUDIT_VIEW}><AuditoriaAdmin /></ProtectedRoute>} />
             <Route path="/admin/analiticas" element={<ProtectedRoute permission={PERMISSIONS.ANALYTICS_VIEW}><AnaliticasAdmin /></ProtectedRoute>} />
             <Route path="/admin/configuracion" element={<ProtectedRoute permission={PERMISSIONS.SETTINGS_MANAGE}><PunctualitySettings /></ProtectedRoute>} />
+            <Route path="/admin/alimentacion" element={<ProtectedRoute anyPermissions={[PERMISSIONS.FOOD_VIEW, PERMISSIONS.FOOD_REGISTER, PERMISSIONS.FOOD_MANAGE, PERMISSIONS.FOOD_REPORTS]}><FoodDashboard /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           </Suspense>

@@ -130,8 +130,9 @@ const run = async () => {
   result = await request('/modules', { cookie: adminCookie });
   expectStatus(result, 200, 'catálogo modular para administración');
   assert.ok(result.data.domains.some(({ id, status }) => id === 'core' && status === 'active'));
-  assert.ok(result.data.domains.some(({ id, status }) => id === 'food' && status === 'reserved'));
+  assert.ok(result.data.domains.some(({ id, status }) => id === 'food' && status === 'active'));
   assert.ok(result.data.domains.some(({ id, status }) => id === 'visits' && status === 'reserved'));
+  assert.ok(result.data.experiences.some(({ id }) => id === 'food-operations'));
   assert.equal(result.data.experiences.some(({ domain_id: domainId }) => domainId === 'visits'), false);
   pass('integraciones futuras no exponen rutas operativas');
 
@@ -141,7 +142,7 @@ const run = async () => {
   pass('cursos base cargados');
   result = await request('/permissions/catalog', { cookie: adminCookie });
   expectStatus(result, 200, 'catálogo permisos y perfiles');
-  assert.ok(result.data.permissions.length >= 10 && result.data.templates.length >= 5);
+  assert.ok(result.data.permissions.length >= 17 && result.data.templates.length >= 5);
   result = await request('/puntualidad/config', { cookie: adminCookie });
   expectStatus(result, 200, 'lee configuración puntualidad');
 
@@ -327,6 +328,8 @@ const run = async () => {
   pass('terminal recibe solo su experiencia operacional');
   result = await request('/users', { cookie: terminalCookie });
   expectStatus(result, 403, 'terminal no ve usuarios');
+  result = await request('/food/services', { cookie: terminalCookie });
+  expectStatus(result, 403, 'terminal de puntualidad no accede a Alimentacion');
   result = await request('/audit', { cookie: terminalCookie });
   expectStatus(result, 403, 'terminal no ve auditoría');
   result = await request('/students', { method: 'POST', cookie: terminalCookie, body: students[0] });
@@ -439,6 +442,55 @@ const run = async () => {
   result = await request('/asistencia/history', { cookie: adminCookie });
   expectStatus(result, 410, 'ruta retirada responde 410 autenticado');
 
+  result = await request('/food/services', { cookie: adminCookie });
+  expectStatus(result, 200, 'lista servicios de Alimentacion');
+  assert.deepEqual(result.data.map(({ code }) => code), ['breakfast', 'lunch', 'snack']);
+  const lunchService = result.data.find(({ code }) => code === 'lunch');
+  result = await request(`/food/students/search?q=${students[0].rut}`, { cookie: adminCookie });
+  expectStatus(result, 200, 'busca estudiante para Alimentacion');
+  assert.equal(result.data[0].beneficiario, false);
+  result = await request(`/food/beneficiaries/${studentIds[0]}`, {
+    method: 'PUT',
+    cookie: adminCookie,
+    body: { active: true }
+  });
+  expectStatus(result, 200, 'habilita beneficiario con auditoria');
+  result = await request('/food/registrations', {
+    method: 'POST',
+    cookie: adminCookie,
+    body: { studentId: studentIds[0], serviceId: lunchService.id_service, origin: 'manual' }
+  });
+  expectStatus(result, 201, 'registra entrega de Alimentacion');
+  const foodRegistrationId = result.data.registration.id_registration;
+  result = await request('/food/registrations', {
+    method: 'POST',
+    cookie: adminCookie,
+    body: { studentId: studentIds[0], serviceId: lunchService.id_service, origin: 'manual' }
+  });
+  expectStatus(result, 409, 'previene doble entrega de Alimentacion');
+  assert.equal(result.data.code, 'DUPLICATE_DELIVERY');
+  result = await request(`/food/today?serviceId=${lunchService.id_service}`, { cookie: adminCookie });
+  expectStatus(result, 200, 'consulta jornada de Alimentacion');
+  assert.equal(result.data.summary.entregas, 1);
+  result = await request(`/food/registrations/${foodRegistrationId}/void`, {
+    method: 'PATCH',
+    cookie: adminCookie,
+    body: { reason: 'Anulacion ficticia para validar trazabilidad' }
+  });
+  expectStatus(result, 200, 'anula entrega sin borrar historial');
+  result = await request('/food/registrations', {
+    method: 'POST',
+    cookie: adminCookie,
+    body: { studentId: studentIds[0], serviceId: lunchService.id_service, origin: 'lector' }
+  });
+  expectStatus(result, 201, 'permite nueva entrega despues de anulacion');
+  result = await request(`/students/${studentIds[0]}/details`, { cookie: adminCookie });
+  expectStatus(result, 200, 'ficha operacional reune modulos');
+  assert.ok(result.data.linea_temporal.some(({ tipo_evento: type }) => type === 'punctuality.registration.created'));
+  assert.ok(result.data.linea_temporal.some(({ tipo_evento: type }) => type === 'food.delivery.registered'));
+  assert.equal(result.data.resumen_operacional.entregas_alimentacion, 1);
+  pass('linea temporal reconstruye Puntualidad y Alimentacion');
+
   const today = todayInSantiago();
   result = await request(`/puntualidad/analitica?desde=${today}&hasta=${today}`, {
     cookie: adminCookie
@@ -456,6 +508,7 @@ const run = async () => {
   expectStatus(result, 200, 'auditoría del sistema');
   assert.ok(result.data.total >= 20);
   assert.ok(result.data.rows.some((row) => row.accion === 'REGISTRAR_INGRESO'));
+  assert.ok(result.data.rows.some((row) => row.accion === 'REGISTRAR_ENTREGA_ALIMENTACION'));
   pass('auditoría contiene operaciones');
 
   result = await request(`/users/${operatorId}`, {

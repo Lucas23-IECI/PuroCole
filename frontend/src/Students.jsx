@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import axios from 'axios';
-import { Search, X, Users, GraduationCap, Database, Upload, FileSpreadsheet, RefreshCw, ShieldCheck, User, Mail, Phone, Calendar, Hash, Shield, Clock, Activity, AlertTriangle, BellRing } from 'lucide-react';
+import { Search, X, Users, GraduationCap, Database, Upload, FileSpreadsheet, RefreshCw, ShieldCheck, User, Mail, Phone, Calendar, Hash, Shield, Clock, Activity, AlertTriangle, BellRing, UtensilsCrossed, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import './index.css';
 
@@ -28,6 +28,29 @@ const getCell = (row, aliases) => {
     if (cleaned !== '') return cleaned;
   }
   return '';
+};
+
+const EVENT_LABELS = {
+  'punctuality.registration.created': 'Ingreso registrado',
+  'punctuality.registration.corrected': 'Ingreso corregido',
+  'punctuality.registration.voided': 'Ingreso anulado',
+  'punctuality.justification.applied': 'Atraso justificado',
+  'punctuality.justification.revoked': 'Justificación revocada',
+  'food.delivery.registered': 'Entrega de alimentación',
+  'food.delivery.voided': 'Entrega de alimentación anulada',
+};
+
+const eventLabel = (event) => EVENT_LABELS[event.tipo_evento] || 'Evento operacional';
+
+const eventDescription = (event) => {
+  if (event.modulo === 'food') {
+    return event.metadatos?.servicio || 'Servicio de alimentación';
+  }
+  const status = event.metadatos?.estado;
+  const severity = event.metadatos?.severidad;
+  if (status && severity) return `${status} · ${severity}`;
+  if (event.metadatos?.tipo) return `Justificación ${event.metadatos.tipo}`;
+  return event.metadatos?.motivo || 'Movimiento trazado en el sistema';
 };
 
 function Students() {
@@ -721,6 +744,78 @@ function Students() {
                         </div>
                       </div>
                     </div>
+
+                    <section className="student-operational" aria-labelledby="student-operational-title">
+                      <div className="student-operational__heading">
+                        <div>
+                          <span>Jornada escolar</span>
+                          <h4 id="student-operational-title">Resumen operacional</h4>
+                        </div>
+                        <span className="student-operational__status" data-active={studentDetails.alumno.activo || undefined}>
+                          {studentDetails.alumno.activo ? 'Matrícula vigente' : 'Matrícula inactiva'}
+                        </span>
+                      </div>
+                      <div className="student-operational__metrics">
+                        <article>
+                          <Clock size={18} />
+                          <span>Ingresos</span>
+                          <strong>{studentDetails.resumen_operacional?.ingresos || 0}</strong>
+                        </article>
+                        <article>
+                          <AlertTriangle size={18} />
+                          <span>Atrasos</span>
+                          <strong>{studentDetails.resumen_operacional?.atrasos || 0}</strong>
+                        </article>
+                        <article>
+                          <CheckCircle2 size={18} />
+                          <span>Justificados</span>
+                          <strong>{studentDetails.resumen_operacional?.atrasos_justificados || 0}</strong>
+                        </article>
+                        <article>
+                          <UtensilsCrossed size={18} />
+                          <span>Alimentación</span>
+                          <strong>{studentDetails.resumen_operacional?.entregas_alimentacion || 0}</strong>
+                        </article>
+                      </div>
+                    </section>
+
+                    <section className="student-timeline" aria-labelledby="student-timeline-title">
+                      <div className="student-timeline__heading">
+                        <div>
+                          <span>Historia compartida</span>
+                          <h4 id="student-timeline-title">Línea temporal</h4>
+                        </div>
+                        <small>Últimos {studentDetails.linea_temporal?.length || 0} eventos</small>
+                      </div>
+                      {studentDetails.linea_temporal?.length ? (
+                        <ol>
+                          {studentDetails.linea_temporal.map((event) => (
+                            <li key={event.id_evento} data-module={event.modulo} data-state={event.estado}>
+                              <span className="student-timeline__marker">
+                                {event.modulo === 'food' ? <UtensilsCrossed size={15} /> : <Clock size={15} />}
+                              </span>
+                              <div>
+                                <strong>{eventLabel(event)}</strong>
+                                <p>{eventDescription(event)}</p>
+                                <small>
+                                  {new Date(event.ocurrido_en).toLocaleString('es-CL', {
+                                    dateStyle: 'medium',
+                                    timeStyle: 'short',
+                                  })}
+                                  {event.registrado_por_nombre ? ` · ${event.registrado_por_nombre}` : ''}
+                                </small>
+                              </div>
+                              <i>{event.modulo === 'food' ? 'Alimentación' : 'Puntualidad'}</i>
+                            </li>
+                          ))}
+                        </ol>
+                      ) : (
+                        <div className="student-timeline__empty">
+                          <Activity size={21} />
+                          <span>Aún no hay eventos operacionales para esta persona.</span>
+                        </div>
+                      )}
+                    </section>
 
                     {/* Datos Personales Panel */}
                     <div style={{

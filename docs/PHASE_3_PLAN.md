@@ -39,7 +39,8 @@ Criterio de salida:
 
 Resultado verificado:
 
-- 0 críticas y 0 altas en dependencias frontend y en las imágenes finales.
+- Al cierre inicial de 3.0 se observaron 0 críticas y 0 altas en dependencias frontend y en las imágenes finales.
+- La revisión actual mantiene React Router 7.18.1 con una excepción temporal no alcanzable en esta SPA, descrita en `SECURITY_EXCEPTIONS.md`.
 - 78 de 78 comprobaciones HTTP aprobadas tras incorporar el catálogo modular.
 - cuatro servicios endurecidos y saludables.
 - respaldo, checksums y restauración aislada aprobados.
@@ -57,7 +58,7 @@ Módulos iniciales:
 - `punctuality`: ingresos, atrasos, justificaciones, correcciones y reportes.
 - `administration`: usuarios, perfiles, permisos y configuración.
 - `audit`: consulta de trazabilidad.
-- `food`: reservado e inactivo hasta Fase 4.
+- `food`: reservado al cerrar la Fase 3.1 y activado posteriormente al iniciar la Fase 4.
 - `visits`: contrato reservado para integrar posteriormente Control de visitas y retiros desde una implementación fuente ya generalizada.
 
 Trabajo:
@@ -77,9 +78,10 @@ Resultado verificado:
 
 - El backend entrega un catálogo único filtrado por permisos efectivos.
 - El portal deriva sus accesos y agrupaciones desde ese contrato.
-- Un administrador ve siete experiencias activas y las dos integraciones reservadas.
+- Al cerrar 3.1, un administrador veía siete experiencias activas y dos integraciones reservadas.
+- El estado actual expone ocho experiencias activas, incluida Alimentación, y mantiene únicamente Visitas/retiros como integración reservada.
 - Un terminal recibe únicamente su experiencia operacional de Puntualidad.
-- Alimentación y Visitas/retiros no exponen rutas ficticias ni aparentan estar habilitadas.
+- En el cierre histórico de 3.1, Alimentación y Visitas/retiros no exponían rutas ficticias ni aparentaban estar habilitadas.
 - 34 de 34 pruebas backend, lint, build y 78 de 78 comprobaciones HTTP aprobadas.
 - Revisión visual de escritorio y 390 × 844 aprobada sin desborde horizontal ni errores de consola.
 
@@ -120,6 +122,8 @@ Criterio de salida:
 
 ### 3.3 — Contrato de eventos operacionales
 
+Estado: completada y validada localmente el 26 de julio de 2026.
+
 Resultado esperado: todos los módulos pueden aportar eventos a una línea temporal común.
 
 Sobre de evento propuesto:
@@ -155,7 +159,16 @@ Criterio de salida:
 
 - La historia de Puntualidad se reconstruye desde una línea temporal sin alterar sus reportes actuales.
 
+Resultado verificado:
+
+- Migración y backfill idempotente implementados.
+- Ingreso, corrección, justificación, revocación y anulación publican versiones en la misma transacción que la auditoría.
+- El contrato ya recibe también registro y anulación de Alimentación.
+- Pruebas unitarias, integración desde volúmenes vacíos y reconstrucción visual aprobadas.
+
 ### 3.4 — Ficha operacional del estudiante
+
+Estado: completada y validada localmente el 26 de julio de 2026.
 
 Resultado esperado: un solo lugar para consultar identidad y actividad operativa.
 
@@ -167,7 +180,7 @@ Secciones:
 - resumen de Puntualidad;
 - línea temporal;
 - documentos accesibles según permiso;
-- espacio reservado, no visible todavía, para Alimentación.
+- resumen y eventos reales de Alimentación cuando existan.
 
 Reglas:
 
@@ -182,7 +195,15 @@ Criterio de salida:
 - Administrador, inspectoría y terminal reciben vistas distintas por permiso.
 - La ficha no necesita consultar una segunda base.
 
+Resultado verificado:
+
+- Identidad, matrícula, estado, resumen de Puntualidad, resumen de Alimentación y últimos eventos se obtienen desde una sola API.
+- La ficha administrativa exige permisos de estudiantes y no se expone al terminal dedicado.
+- Escritorio y 390 × 844 aprobados sin desborde horizontal ni errores de consola.
+
 ### 3.5 — Aceptación y congelamiento de contratos
+
+Estado: aceptación automatizada completada el 26 de julio de 2026; revisión institucional humana seguirá siendo puerta de piloto.
 
 Resultado esperado: Fase 4 puede integrar Alimentación sobre una base estable.
 
@@ -208,6 +229,16 @@ Documentos a cerrar:
 - procedimiento de respaldo/restauración;
 - decisión de retención de eventos y documentos;
 - handoff para Fase 4.
+
+Resultado automatizado:
+
+- 46 de 46 pruebas backend.
+- Lint y build de frontend aprobados.
+- 89 de 89 comprobaciones HTTP desde una instalación efímera.
+- Endurecimiento de cuatro contenedores aprobado.
+- Respaldo, hashes y restauración aislada aprobados.
+- Redirección HTTPS, TLS y cookie `Secure` aprobados.
+- Revisión visual autenticada de Alimentación y ficha en escritorio y móvil.
 
 ## Secuencia recomendada de trabajo
 

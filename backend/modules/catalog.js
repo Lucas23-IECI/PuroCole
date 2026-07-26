@@ -35,8 +35,8 @@ const domains = [
     id: 'food',
     name: 'Alimentación',
     short_name: 'Alimentación',
-    description: 'Integración reservada para servicios, beneficiarios y control PAE.',
-    status: 'reserved',
+    description: 'Servicios diarios, beneficiarios y entregas sin duplicados.',
+    status: 'active',
     order: 50
   },
   {
@@ -115,6 +115,19 @@ const experiences = [
     surface: 'terminal',
     order: 40,
     permissions: ['punctuality.register']
+  },
+  {
+    id: 'food-operations',
+    domain_id: 'food',
+    label: 'Jornada de alimentación',
+    eyebrow: 'Operación diaria',
+    description: 'Registro de desayuno, almuerzo y once con control de beneficiarios.',
+    path: '/admin/alimentacion',
+    icon: 'utensils',
+    tone: 'ochre',
+    surface: 'portal',
+    order: 10,
+    permissions: ['food.view', 'food.register', 'food.manage', 'food.reports']
   },
   {
     id: 'users',

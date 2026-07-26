@@ -36,7 +36,7 @@ PuroCole sí es:
 
 ## Estado del repositorio
 
-- Ruta local: `C:\Users\lucas\Downloads\ProyectosInteresantes\PuroCole`.
+- Ruta local: directorio actual del repositorio; el producto y el remoto se identifican exclusivamente como PuroCole.
 - Remoto: `https://github.com/Lucas23-IECI/PuroCole`.
 - Repositorio local independiente del directorio padre.
 - La línea base de puntualidad fue copiada desde el commit `e47cdcef5916d2d628b9bd06a05341b7e95808c2`.
@@ -44,7 +44,7 @@ PuroCole sí es:
 - No se copiaron `.git`, `.env`, respaldos, planillas operacionales, dependencias ni artefactos de compilación.
 - Los repositorios de origen no fueron modificados.
 - La validación automática posterior a la copia está aprobada y registrada en `docs/BASELINE.md`.
-- No se ha realizado commit ni push de la importación.
+- La línea base y los hitos técnicos completados están versionados en el remoto de PuroCole.
 
 ## Sistemas de origen
 
@@ -67,9 +67,7 @@ Se reutiliza como base porque ya contiene:
 
 ### Fuente funcional: alimentación
 
-Ruta:
-
-`C:\Users\lucas\Downloads\ProyectosInteresantes\ColegioSanAgustinComedores`
+Origen: repositorio local externo de Alimentación. Su ruta e identidad institucional no se publican en PuroCole.
 
 No se copiará como una segunda aplicación completa. Más adelante se trasladarán selectivamente:
 
@@ -99,9 +97,9 @@ No se copiará como una segunda aplicación completa. Más adelante se trasladar
 - **Puertas manuales de Fases 1 y 2:** completadas el 26 de julio de 2026 con Docker, datos ficticios, recorrido autenticado, respaldo y restauración.
 - **Fase 2:** completada y validada integralmente.
 - **Hallazgos previos a piloto:** dependencias e imágenes, endurecimiento de contenedores y respuesta CORS, registrados en `docs/VALIDATION_2026-07-26.md`.
-- **Siguiente fase:** núcleo modular, comenzando por la subfase 3.0 de cierre técnico definida en `docs/PHASE_3_PLAN.md`.
-
-Alimentación todavía no está integrada y la arquitectura funcional heredada no se ha rediseñado.
+- **Fase 3:** 3.0, 3.1, 3.3, 3.4 y la aceptación automatizada de 3.5 completadas; 3.2 continúa con extracción incremental.
+- **Fase 4:** núcleo de Alimentación implementado y validado; importación PAE, terminal dedicado y reportes completos siguen pendientes.
+- **Visitas y retiros:** permanece como integración reservada y se desarrolla en una implementación externa.
 
 ## Generalización institucional
 
@@ -127,4 +125,4 @@ El subproyecto independiente de cuestionarios y los recursos visuales del establ
 
 ## Próximo resultado esperado
 
-Cerrar la subfase 3.0 y construir el núcleo modular según `docs/PHASE_3_PLAN.md`. Alimentación todavía no debe integrarse.
+Completar la extracción 3.2 sin romper la API y terminar Alimentación con importación PAE, terminal de lector y reportes. Después se repetirá la aceptación integral antes de recibir la implementación externa de Visitas y Retiros.

@@ -10,6 +10,7 @@ const {
   removeStoredFile,
   resolveDocumentPath
 } = require('../services/documentService');
+const { publishOperationalEvent } = require('../services/operationalEventService');
 
 const ACTIVE_ENTRY_FILTER = "r.tipo_registro = 'Entrada' AND r.anulado = false AND r.estado IN ('Presente', 'Atrasado')";
 
@@ -163,6 +164,19 @@ const createPunctualityRouter = ({ pool, verifyToken, verifyPermission, verifyAn
       }
 
       const registration = inserted.rows[0];
+      await publishOperationalEvent(client, {
+        studentId,
+        module: 'punctuality',
+        eventType: 'punctuality.registration.created',
+        sourceEntity: 'attendance_registration',
+        sourceId: registration.id_registro,
+        sourceVersion: registration.version,
+        occurredAt: `${now.fecha}T${now.hora}`,
+        origin: origen,
+        actorUserId: req.user.id,
+        metadata: { estado: status, severidad },
+        idempotencyKey: `punctuality:registration:${registration.id_registro}:created:v${registration.version}`
+      });
       await insertarAudit(client, {
         usuario_id: req.user.id,
         usuario_correo: req.user.correo,
@@ -310,6 +324,24 @@ const createPunctualityRouter = ({ pool, verifyToken, verifyPermission, verifyAn
         INSERT INTO puntualidad_correcciones (id_registro, accion, motivo, antes, despues, realizado_por)
         VALUES ($1, 'CORREGIR', $2, $3, $4, $5)
       `, [registrationId, reasonValidation.value, JSON.stringify(before), JSON.stringify(after), req.user.id]);
+      await publishOperationalEvent(client, {
+        studentId: after.id_alumno,
+        module: 'punctuality',
+        eventType: 'punctuality.registration.corrected',
+        sourceEntity: 'attendance_registration',
+        sourceId: registrationId,
+        sourceVersion: after.version,
+        state: 'corregido',
+        occurredAt: `${correctedDate}T${correctedTime}`,
+        origin: 'portal',
+        actorUserId: req.user.id,
+        metadata: {
+          estado: after.estado,
+          severidad: after.severidad,
+          motivo: reasonValidation.value
+        },
+        idempotencyKey: `punctuality:registration:${registrationId}:corrected:v${after.version}`
+      });
       await insertarAudit(client, {
         usuario_id: req.user.id,
         usuario_correo: req.user.correo,
@@ -371,6 +403,21 @@ const createPunctualityRouter = ({ pool, verifyToken, verifyPermission, verifyAn
         INSERT INTO puntualidad_correcciones (id_registro, accion, motivo, antes, despues, realizado_por)
         VALUES ($1, 'ANULAR', $2, $3, $4, $5)
       `, [registrationId, reasonValidation.value, JSON.stringify(before), JSON.stringify(after), req.user.id]);
+      await publishOperationalEvent(client, {
+        studentId: after.id_alumno,
+        module: 'punctuality',
+        eventType: 'punctuality.registration.voided',
+        sourceEntity: 'attendance_registration',
+        sourceId: registrationId,
+        sourceVersion: after.version,
+        state: 'anulado',
+        occurredAt: new Date(),
+        origin: 'portal',
+        actorUserId: req.user.id,
+        metadata: { motivo: reasonValidation.value },
+        voidReason: reasonValidation.value,
+        idempotencyKey: `punctuality:registration:${registrationId}:voided:v${after.version}`
+      });
       await insertarAudit(client, {
         usuario_id: req.user.id,
         usuario_correo: req.user.correo,
@@ -462,6 +509,22 @@ const createPunctualityRouter = ({ pool, verifyToken, verifyPermission, verifyAn
         INSERT INTO puntualidad_correcciones (id_registro, accion, motivo, antes, despues, realizado_por)
         VALUES ($1, 'JUSTIFICAR', $2, $3, $4, $5)
       `, [registrationId, reasonValidation.value, JSON.stringify(before), JSON.stringify(after), req.user.id]);
+      await publishOperationalEvent(client, {
+        studentId: after.id_alumno,
+        module: 'punctuality',
+        eventType: 'punctuality.justification.applied',
+        sourceEntity: 'attendance_registration',
+        sourceId: registrationId,
+        sourceVersion: after.version,
+        occurredAt: new Date(),
+        origin: 'portal',
+        actorUserId: req.user.id,
+        metadata: {
+          tipo: justificationType,
+          tiene_documento: Boolean(createdDocument)
+        },
+        idempotencyKey: `punctuality:registration:${registrationId}:justified:v${after.version}`
+      });
       await insertarAudit(client, {
         usuario_id: req.user.id,
         usuario_correo: req.user.correo,
@@ -546,6 +609,20 @@ const createPunctualityRouter = ({ pool, verifyToken, verifyPermission, verifyAn
         INSERT INTO puntualidad_correcciones (id_registro, accion, motivo, antes, despues, realizado_por)
         VALUES ($1, 'REVOCAR_JUSTIFICACION', $2, $3, $4, $5)
       `, [registrationId, reasonValidation.value, JSON.stringify(before), JSON.stringify(after), req.user.id]);
+      await publishOperationalEvent(client, {
+        studentId: after.id_alumno,
+        module: 'punctuality',
+        eventType: 'punctuality.justification.revoked',
+        sourceEntity: 'attendance_registration',
+        sourceId: registrationId,
+        sourceVersion: after.version,
+        state: 'corregido',
+        occurredAt: new Date(),
+        origin: 'portal',
+        actorUserId: req.user.id,
+        metadata: { motivo: reasonValidation.value },
+        idempotencyKey: `punctuality:registration:${registrationId}:justification-revoked:v${after.version}`
+      });
       await insertarAudit(client, {
         usuario_id: req.user.id,
         usuario_correo: req.user.correo,

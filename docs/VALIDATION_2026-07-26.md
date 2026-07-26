@@ -40,7 +40,7 @@ La edición de un perfil devolvía HTTP 500 porque el detalle de auditoría util
 | Build frontend local | Aprobado |
 | Build Docker sin caché | Backend y frontend aprobados |
 | Auditoría npm de producción backend | 0 vulnerabilidades |
-| Dependencias frontend con Docker Scout | 0 críticas y 0 altas |
+| Dependencias frontend | React Router actualizado a 7.18.1; excepción RSC no alcanzable documentada en `SECURITY_EXCEPTIONS.md` |
 | Imágenes finales con Docker Scout | Backend, PostgreSQL y frontend: 0 críticas y 0 altas |
 | Parseo de scripts PowerShell | 3 de 3 |
 | Docker Compose | Configuración válida |
@@ -85,7 +85,7 @@ Esto es una comprobación de estabilidad local, no una prueba formal de capacida
 - Backend: runtime sin gestores de paquetes, Alpine actualizado y 0 críticas/altas.
 - PostgreSQL: runtime final sin la capa histórica de `gosu`, arranque y restauración aprobados, 0 críticas/altas.
 - Frontend: Nginx no privilegiado y dependencias de planilla reemplazadas; 0 críticas/altas.
-- React Router: rama 6 compatible con la API usada y fuera de los rangos detectados.
+- React Router: 7.18.1, última versión publicada. El aviso RSC vigente no es alcanzable por la SPA y quedó documentado con mitigación y condición de reapertura.
 - CORS: origen ajeno responde HTTP 403 JSON controlado con `request_id`.
 - Contenedores: filesystem raíz de solo lectura, `no-new-privileges`, redes separadas y capacidades mínimas.
 - HTTPS: perfil Compose separado, redirección HTTP, TLS 1.2/1.3, HSTS y cookie `Secure`.

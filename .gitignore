@@ -29,6 +29,8 @@ docs/NUEVAS_FUNCIONALIDADES_MAYO.md
 /usuarios_*.xlsx
 /carnets_*.pdf
 /backups/
+/backups-local/
+/outputs/
 /datos/
 /imports/
 /exports/
@@ -48,3 +50,4 @@ documentos/
 *.pfx
 *.p12
 /certs/
+/.qa-acceptance*.log

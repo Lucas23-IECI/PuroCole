@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const {
   STUDENT_PUBLIC_FIELDS,
   getStudentDetails,
+  getStudentOperationalSummary,
   listCourses,
   listStudents,
   searchStudents
@@ -48,4 +49,19 @@ test('el detalle diferencia una ficha ausente sin inventar datos', async () => {
   const populatedQueryable = queryableWith([{ id_alumno: 9, nombres: 'Bruno' }]);
   assert.deepEqual(await getStudentDetails(populatedQueryable, 9), { id_alumno: 9, nombres: 'Bruno' });
   assert.deepEqual(populatedQueryable.calls[0].params, [9]);
+});
+
+test('el resumen operacional se calcula sobre puntualidad y alimentación sin exponer documentos', async () => {
+  const queryable = queryableWith([{
+    ingresos: 3,
+    atrasos: 1,
+    entregas_alimentacion: 2,
+    beneficiario_alimentacion: true
+  }]);
+  const summary = await getStudentOperationalSummary(queryable, 9);
+  assert.equal(summary.ingresos, 3);
+  assert.equal(summary.entregas_alimentacion, 2);
+  assert.deepEqual(queryable.calls[0].params, [9]);
+  assert.match(queryable.calls[0].sql, /food_registrations/);
+  assert.doesNotMatch(queryable.calls[0].sql, /justification_documents/);
 });

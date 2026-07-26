@@ -51,9 +51,7 @@ Los elementos heredados específicos se retiraron o generalizaron en la Fase 2.
 
 ## Fuente de Alimentación
 
-Origen:
-
-`C:\Users\lucas\Downloads\ProyectosInteresantes\ColegioSanAgustinComedores`
+Origen: repositorio local externo de Alimentación. Su ruta e identidad institucional no forman parte del producto.
 
 Referencia revisada:
 

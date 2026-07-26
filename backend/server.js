@@ -23,6 +23,7 @@ const { calculateStatusAndSeverity } = require('./utils/punctuality');
 const { isIsoDate, validateDateRange } = require('./utils/validation');
 const { createCoreRouter } = require('./routes/core');
 const { createPunctualityRouter } = require('./routes/punctuality');
+const { createFoodRouter } = require('./routes/food');
 const { getVisibleModuleCatalog } = require('./modules/catalog');
 const {
   attachPermissionProfile,
@@ -325,7 +326,7 @@ const bootstrapBaseSchema = async () => {
 app.get('/api/health/live', (req, res) => {
   res.json({
     status: 'OK',
-    service: 'purocole-puntualidad',
+    service: 'purocole-api',
     uptime_seconds: Math.floor(process.uptime()),
     timestamp: new Date().toISOString()
   });
@@ -342,14 +343,14 @@ const readinessHandler = async (req, res) => {
 
     res.status(ready ? 200 : 503).json({
       status: ready ? 'OK' : 'ERROR',
-      service: 'purocole-puntualidad',
+      service: 'purocole-api',
       database: ready ? 'ready' : 'migrations_unavailable',
       timestamp: new Date().toISOString()
     });
   } catch {
     res.status(503).json({
       status: 'ERROR',
-      service: 'purocole-puntualidad',
+      service: 'purocole-api',
       database: 'unavailable',
       timestamp: new Date().toISOString()
     });
@@ -549,6 +550,15 @@ app.use('/api', createCoreRouter({
   pool,
   verifyToken,
   verifyAnyPermission
+}));
+
+app.use('/api/food', createFoodRouter({
+  pool,
+  verifyToken,
+  verifyPermission,
+  verifyAnyPermission,
+  insertarAudit,
+  getClientIp
 }));
 
 // SUPERFICIE HEREDADA DE ASISTENCIA
