@@ -22,7 +22,7 @@ Resultado esperado: una base verde y defendible antes de mover responsabilidades
 
 Estado: completada y validada localmente el 26 de julio de 2026.
 
-1. Actualizar React Router y volver a ejecutar lint, build, navegación y las 74 pruebas HTTP.
+1. Actualizar React Router y volver a ejecutar lint, build, navegación y la batería HTTP.
 2. Actualizar o reducir las imágenes de Node y PostgreSQL hasta eliminar vulnerabilidades críticas o documentar técnicamente cualquier excepción no alcanzable.
 3. Añadir `no-new-privileges`, capacidades mínimas y filesystem de solo lectura donde sea compatible.
 4. Convertir el rechazo CORS en una respuesta 4xx controlada.
@@ -40,7 +40,7 @@ Criterio de salida:
 Resultado verificado:
 
 - 0 críticas y 0 altas en dependencias frontend y en las imágenes finales.
-- 74 de 74 comprobaciones HTTP aprobadas.
+- 78 de 78 comprobaciones HTTP aprobadas tras incorporar el catálogo modular.
 - cuatro servicios endurecidos y saludables.
 - respaldo, checksums y restauración aislada aprobados.
 - redirección HTTPS, TLS y cookie `Secure` aprobados.
@@ -49,6 +49,8 @@ Resultado verificado:
 
 Resultado esperado: frontend y backend comparten la misma idea de módulo.
 
+Estado: completada y validada localmente el 26 de julio de 2026.
+
 Módulos iniciales:
 
 - `core`: estudiantes, matrículas, cursos, documentos y ficha.
@@ -56,6 +58,7 @@ Módulos iniciales:
 - `administration`: usuarios, perfiles, permisos y configuración.
 - `audit`: consulta de trazabilidad.
 - `food`: reservado e inactivo hasta Fase 4.
+- `visits`: contrato reservado para integrar posteriormente Control de visitas y retiros desde una implementación fuente ya generalizada.
 
 Trabajo:
 
@@ -69,6 +72,16 @@ Criterio de salida:
 
 - Añadir un módulo al catálogo no exige modificar varias navegaciones independientes.
 - La terminal y el portal conservan experiencias separadas.
+
+Resultado verificado:
+
+- El backend entrega un catálogo único filtrado por permisos efectivos.
+- El portal deriva sus accesos y agrupaciones desde ese contrato.
+- Un administrador ve siete experiencias activas y las dos integraciones reservadas.
+- Un terminal recibe únicamente su experiencia operacional de Puntualidad.
+- Alimentación y Visitas/retiros no exponen rutas ficticias ni aparentan estar habilitadas.
+- 34 de 34 pruebas backend, lint, build y 78 de 78 comprobaciones HTTP aprobadas.
+- Revisión visual de escritorio y 390 × 844 aprobada sin desborde horizontal ni errores de consola.
 
 ### 3.2 — Extraer el núcleo sin romper la API
 
@@ -93,7 +106,7 @@ Para cada bloque:
 
 Criterio de salida:
 
-- Las 74 pruebas de integración siguen aprobadas sin adaptar expectativas funcionales.
+- Las pruebas de integración siguen aprobadas sin adaptar expectativas funcionales.
 - Puntualidad puede identificarse y probarse como módulo.
 
 ### 3.3 — Contrato de eventos operacionales

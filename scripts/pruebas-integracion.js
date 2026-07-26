@@ -127,6 +127,13 @@ const run = async () => {
   expectStatus(result, 401, 'invalida token anterior al cambio de clave');
   result = await request('/auth/me', { cookie: adminCookie });
   expectStatus(result, 200, 'mantiene sesión nueva administrador');
+  result = await request('/modules', { cookie: adminCookie });
+  expectStatus(result, 200, 'catálogo modular para administración');
+  assert.ok(result.data.domains.some(({ id, status }) => id === 'core' && status === 'active'));
+  assert.ok(result.data.domains.some(({ id, status }) => id === 'food' && status === 'reserved'));
+  assert.ok(result.data.domains.some(({ id, status }) => id === 'visits' && status === 'reserved'));
+  assert.equal(result.data.experiences.some(({ domain_id: domainId }) => domainId === 'visits'), false);
+  pass('integraciones futuras no exponen rutas operativas');
 
   result = await request('/courses', { cookie: adminCookie });
   expectStatus(result, 200, 'lista cursos base');
@@ -313,6 +320,11 @@ const run = async () => {
   });
   expectStatus(result, 200, 'terminal cambia clave obligatoria');
   const terminalCookie = cookieFrom(result.response);
+  result = await request('/modules', { cookie: terminalCookie });
+  expectStatus(result, 200, 'catálogo modular para terminal');
+  assert.deepEqual(result.data.domains.map(({ id }) => id), ['punctuality']);
+  assert.deepEqual(result.data.experiences.map(({ id }) => id), ['punctuality-terminal']);
+  pass('terminal recibe solo su experiencia operacional');
   result = await request('/users', { cookie: terminalCookie });
   expectStatus(result, 403, 'terminal no ve usuarios');
   result = await request('/audit', { cookie: terminalCookie });

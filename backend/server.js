@@ -22,6 +22,7 @@ const {
 const { calculateStatusAndSeverity } = require('./utils/punctuality');
 const { isIsoDate, validateDateRange } = require('./utils/validation');
 const { createPunctualityRouter } = require('./routes/punctuality');
+const { getVisibleModuleCatalog } = require('./modules/catalog');
 const {
   attachPermissionProfile,
   countActivePermissionHolders,
@@ -460,6 +461,10 @@ app.get('/api/auth/me', verifyToken, async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: 'Error en el servidor.' });
   }
+});
+
+app.get('/api/modules', verifyToken, (req, res) => {
+  res.json(getVisibleModuleCatalog(req.user.permissions));
 });
 
 app.post('/api/auth/change-password', verifyToken, async (req, res) => {

@@ -59,7 +59,7 @@ Salida:
 
 ## Fase 3 — Núcleo modular
 
-Estado: en ejecución; subfase 3.0 completada y subfase 3.1 en inicio.
+Estado: en ejecución; subfases 3.0 y 3.1 completadas. La siguiente unidad es 3.2.
 
 Plan detallado: `PHASE_3_PLAN.md`.
 
