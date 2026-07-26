@@ -313,6 +313,199 @@
 .food-notice[data-kind="error"] { border-left-color: #a92f3a; }
 .food-notice button { display: grid; width: 34px; height: 34px; place-items: center; border: 0; background: transparent; color: var(--muted); cursor: pointer; }
 
+.food-mode-nav {
+  display: flex;
+  gap: 4px;
+  width: fit-content;
+  margin: 0 0 18px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+}
+
+.food-mode-nav button {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 15px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.food-mode-nav button:hover { color: var(--ink-strong); background: var(--surface-subtle); }
+.food-mode-nav button[data-active] { background: #173247; color: #fff; }
+
+.food-dietary-alert {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 13px 14px;
+  border: 1px solid #d49b3f;
+  background: #fff5de;
+  color: #77450b;
+}
+
+.food-dietary-alert > div { display: grid; gap: 3px; }
+.food-dietary-alert strong { font-size: 0.79rem; }
+.food-dietary-alert span { font-size: 0.75rem; line-height: 1.45; }
+
+.food-alert-editor {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.food-alert-editor label { color: var(--ink); font-size: 0.74rem; font-weight: 850; }
+.food-alert-editor textarea {
+  width: 100%;
+  min-height: 76px;
+  resize: vertical;
+  padding: 11px 12px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.78rem;
+}
+.food-alert-editor > div { display: flex; justify-content: flex-end; gap: 8px; }
+
+.food-management-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+  gap: clamp(24px, 4vw, 54px);
+}
+
+.food-panel { min-width: 0; }
+.food-panel > header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 13px 14px;
+  border-bottom: 1px solid #d3dfe7;
+  background: #edf4f8;
+}
+.food-panel > header > div { display: grid; gap: 2px; }
+.food-panel > header h2 { margin: 0; color: #173247; font-size: 1rem; letter-spacing: -0.015em; }
+.food-panel > header p { margin: 0; color: #5d7180; font-size: 0.72rem; line-height: 1.4; }
+
+.food-import-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.food-file-picker {
+  display: flex;
+  min-height: 84px;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 1px dashed #7892a3;
+  background: var(--surface-raised);
+  color: #31556b;
+  cursor: pointer;
+}
+.food-file-picker:hover { border-color: #a56719; background: #fff9ef; }
+.food-file-picker input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.food-file-picker span { display: grid; gap: 3px; }
+.food-file-picker strong { color: var(--ink-strong); font-size: 0.84rem; }
+.food-file-picker small { color: var(--muted); font-size: 0.7rem; }
+
+.food-import-preview { display: grid; gap: 16px; margin-top: 18px; }
+.food-preview-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--border); }
+.food-preview-metrics article { display: grid; gap: 3px; padding: 13px; }
+.food-preview-metrics article + article { border-left: 1px solid var(--border); }
+.food-preview-metrics span { color: var(--muted); font-size: 0.68rem; font-weight: 800; text-transform: uppercase; }
+.food-preview-metrics strong { color: var(--ink-strong); font-size: 1.55rem; }
+.food-preview-metrics article[data-tone="success"] strong { color: #176d4f; }
+.food-preview-metrics article[data-tone="danger"] strong { color: #a92f3a; }
+
+.food-import-errors {
+  max-height: 260px;
+  overflow: auto;
+  border-left: 4px solid #a92f3a;
+  background: #fff2f2;
+}
+.food-import-errors p { display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 9px 12px; color: #81313a; font-size: 0.74rem; }
+.food-import-errors p + p { border-top: 1px solid #f2ced2; }
+.food-import-ready { display: flex; align-items: center; gap: 9px; padding: 13px; border-left: 4px solid #1a7a58; background: #ebf7f1; color: #176d4f; font-size: 0.77rem; font-weight: 750; }
+
+.food-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 13px;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+}
+.food-checkbox input { width: 17px; height: 17px; margin-top: 2px; accent-color: #173247; }
+.food-checkbox span { display: grid; gap: 2px; }
+.food-checkbox strong { color: var(--ink); font-size: 0.76rem; }
+.food-checkbox small { color: var(--muted); font-size: 0.68rem; line-height: 1.4; }
+.food-import-submit { justify-self: end; }
+
+.food-import-history > article {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 2px;
+  border-bottom: 1px solid var(--border);
+}
+.food-import-history article > div { display: grid; gap: 3px; min-width: 0; }
+.food-import-history strong { overflow: hidden; color: var(--ink-strong); font-size: 0.78rem; text-overflow: ellipsis; white-space: nowrap; }
+.food-import-history span { color: var(--muted); font-size: 0.67rem; }
+.food-import-history b { color: #176d4f; font-size: 0.7rem; white-space: nowrap; }
+
+.food-report-filters {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(130px, 1fr)) auto;
+  align-items: end;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+}
+.food-report-filters label { display: grid; gap: 6px; color: var(--ink); font-size: 0.7rem; font-weight: 800; }
+.food-report-filters input {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 10px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.75rem;
+}
+.food-report-filters .app-select-trigger { width: 100%; min-height: 42px; }
+
+.food-report-summary { display: flex; gap: 10px; margin: 18px 0; overflow-x: auto; }
+.food-report-summary article { display: grid; min-width: 180px; gap: 3px; padding: 14px; border-top: 3px solid #a56719; background: #173247; color: #fff; }
+.food-report-summary span { color: #c5d4dd; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+.food-report-summary strong { font-size: 1.8rem; }
+.food-report-summary small { color: #9eb0bc; font-size: 0.67rem; }
+.food-report-summary .food-list-state { width: 100%; }
+
+.food-report-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 10px; color: var(--muted); font-size: 0.73rem; }
+.food-report-table-wrap { overflow: auto; border: 1px solid var(--border); }
+.food-report-table { width: 100%; min-width: 760px; border-collapse: collapse; background: var(--surface-raised); }
+.food-report-table th { padding: 10px 12px; background: #173247; color: #fff; font-size: 0.68rem; text-align: left; text-transform: uppercase; }
+.food-report-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--ink); font-size: 0.74rem; }
+.food-report-table td small { display: block; margin-top: 2px; color: var(--muted); }
+.food-report-table td span { display: inline-block; padding: 3px 7px; background: #e9f5ee; color: #176d4f; font-size: 0.66rem; font-weight: 800; }
+.food-report-table td span[data-voided] { background: #fff0f0; color: #a92f3a; }
+
 .food-dialog-backdrop {
   position: fixed;
   z-index: 3300;
@@ -338,11 +531,15 @@
 
 @media (max-width: 980px) {
   .food-command,
-  .food-workspace { grid-template-columns: 1fr; }
+  .food-workspace,
+  .food-management-grid { grid-template-columns: 1fr; }
+  .food-report-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 640px) {
   .food-page { padding: 16px; }
+  .food-mode-nav { width: 100%; overflow-x: auto; }
+  .food-mode-nav button { flex: 1 0 auto; }
   .food-command { margin-inline: -16px; padding: 22px 16px; }
   .food-day-stats { grid-template-columns: 1fr; }
   .food-day-stats article { min-height: 100px; }
@@ -352,6 +549,13 @@
   .food-result { grid-template-columns: auto minmax(0, 1fr); }
   .food-result i { grid-column: 2; justify-self: start; }
   .food-selection__actions { display: grid; }
+  .food-alert-editor > div { display: grid; }
+  .food-import-actions,
+  .food-report-filters { grid-template-columns: 1fr; }
+  .food-preview-metrics { grid-template-columns: 1fr; }
+  .food-preview-metrics article + article { border-top: 1px solid var(--border); border-left: 0; }
+  .food-import-submit { width: 100%; justify-self: stretch; }
+  .food-report-heading { align-items: stretch; flex-direction: column; }
   .food-dialog > div { display: grid; }
 }
 

@@ -16,6 +16,9 @@ export const PERMISSIONS = {
   FOOD_REGISTER: 'food.register',
   FOOD_MANAGE: 'food.manage',
   FOOD_REPORTS: 'food.reports',
+  FOOD_IMPORT: 'food.import',
+  FOOD_ALERTS_VIEW: 'food.alerts.view',
+  FOOD_ALERTS_MANAGE: 'food.alerts.manage',
 };
 
 export const ADMIN_MODULE_PERMISSIONS = [
@@ -32,6 +35,9 @@ export const ADMIN_MODULE_PERMISSIONS = [
   PERMISSIONS.FOOD_REGISTER,
   PERMISSIONS.FOOD_MANAGE,
   PERMISSIONS.FOOD_REPORTS,
+  PERMISSIONS.FOOD_IMPORT,
+  PERMISSIONS.FOOD_ALERTS_VIEW,
+  PERMISSIONS.FOOD_ALERTS_MANAGE,
 ];
 
 export const hasPermission = (user, permission) => Array.isArray(user?.permissions)

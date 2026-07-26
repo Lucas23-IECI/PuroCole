@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const pool = require('./db');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const fs = require('fs');
 const path = require('path');
@@ -11,7 +10,7 @@ const { randomUUID } = require('crypto');
 const { rateLimit } = require('express-rate-limit');
 require('dotenv').config();
 
-const { verifyToken, verifyPermission, verifyAnyPermission, JWT_SECRET } = require('./middleware/auth');
+const { verifyToken, verifyPermission, verifyAnyPermission } = require('./middleware/auth');
 const { runMigrations } = require('./migrations');
 const {
   normalizeEmail,
@@ -20,11 +19,11 @@ const {
   validatePassword
 } = require('./utils/security');
 const { calculateStatusAndSeverity } = require('./utils/punctuality');
-const { isIsoDate, validateDateRange } = require('./utils/validation');
 const { createCoreRouter } = require('./routes/core');
 const { createPunctualityRouter } = require('./routes/punctuality');
 const { createFoodRouter } = require('./routes/food');
-const { getVisibleModuleCatalog } = require('./modules/catalog');
+const { createAuthRouter, setSessionCookie } = require('./routes/auth');
+const { createAuditRouter } = require('./routes/audit');
 const {
   attachPermissionProfile,
   countActivePermissionHolders,
@@ -135,44 +134,6 @@ const loginLimiter = rateLimit({
 app.use('/api', apiLimiter);
 
 const PORT = process.env.PORT || 5000;
-const cookieOptions = {
-  httpOnly: true,
-  secure: String(process.env.COOKIE_SECURE || '').toLowerCase() === 'true',
-  sameSite: 'strict',
-  path: '/'
-};
-
-const toPublicUser = (user) => ({
-  id: user.id,
-  correo: user.correo,
-  rol: user.rol,
-  profile_name: user.profile_name || user.rol,
-  nombre: user.nombre,
-  cargo: user.cargo || null,
-  debe_cambiar_password: Boolean(user.debe_cambiar_password),
-  permissions: Array.isArray(user.permissions) ? user.permissions : [],
-  recommended_permissions: Array.isArray(user.recommended_permissions) ? user.recommended_permissions : []
-});
-
-const setSessionCookie = (res, user) => {
-  const token = jwt.sign(
-    {
-      id: user.id,
-      correo: user.correo,
-      rol: user.rol,
-      nombre: user.nombre,
-      token_version: user.token_version
-    },
-    JWT_SECRET,
-    { expiresIn: '12h' }
-  );
-
-  res.cookie('token', token, {
-    ...cookieOptions,
-    maxAge: 12 * 60 * 60 * 1000
-  });
-};
-
 const getDefaultUserPassword = () => {
   const password = process.env.DEFAULT_USER_PASSWORD;
   const passwordError = validatePassword(password);
@@ -360,191 +321,14 @@ const readinessHandler = async (req, res) => {
 app.get('/api/health/ready', readinessHandler);
 app.get('/api/health', readinessHandler);
 
-// AUTHENTICATION
-app.post('/api/auth/login', loginLimiter, async (req, res) => {
-  const { correo, password } = req.body;
-  if (!correo || !password) {
-    return res.status(400).json({ message: 'Correo y contraseña son requeridos.' });
-  }
-
-  try {
-    const normalizedEmail = normalizeEmail(correo);
-    const userRes = await pool.query(
-      'SELECT * FROM usuarios WHERE LOWER(correo) = $1 AND eliminado_en IS NULL LIMIT 1',
-      [normalizedEmail]
-    );
-
-    if (userRes.rows.length === 0) {
-      await registrarAudit({
-        usuario_correo: normalizedEmail.slice(0, 150),
-        accion: 'LOGIN_FALLIDO',
-        detalle: { motivo: 'credenciales_invalidas' },
-        ip: getClientIp(req)
-      });
-      return res.status(401).json({ message: 'Credenciales inválidas.' });
-    }
-
-    const user = userRes.rows[0];
-
-    if (!user.activo) {
-      await registrarAudit({
-        usuario_id: user.id,
-        usuario_correo: user.correo,
-        accion: 'LOGIN_FALLIDO',
-        detalle: { motivo: 'cuenta_desactivada' },
-        ip: getClientIp(req)
-      });
-      return res.status(401).json({ message: 'Credenciales inválidas.' });
-    }
-
-    if (user.bloqueado_hasta && new Date(user.bloqueado_hasta) > new Date()) {
-      return res.status(423).json({ message: 'Cuenta bloqueada temporalmente. Intente más tarde.' });
-    }
-
-    const validPass = await bcrypt.compare(password, user.password_hash);
-    if (!validPass) {
-      await pool.query(`
-        UPDATE usuarios
-        SET bloqueado_hasta = CASE
-              WHEN intentos_fallidos + 1 >= 5 THEN CURRENT_TIMESTAMP + interval '15 minutes'
-              ELSE NULL
-            END,
-            intentos_fallidos = CASE
-              WHEN intentos_fallidos + 1 >= 5 THEN 0
-              ELSE intentos_fallidos + 1
-            END
-        WHERE id = $1
-      `, [user.id]);
-      await registrarAudit({
-        usuario_id: user.id,
-        usuario_correo: user.correo,
-        accion: 'LOGIN_FALLIDO',
-        detalle: { motivo: 'credenciales_invalidas' },
-        ip: getClientIp(req)
-      });
-      return res.status(401).json({ message: 'Credenciales inválidas.' });
-    }
-
-    const updatedUser = await pool.query(
-      `UPDATE usuarios
-       SET intentos_fallidos = 0, bloqueado_hasta = NULL, ultimo_acceso = CURRENT_TIMESTAMP
-       WHERE id = $1
-       RETURNING id, correo, rol, nombre, cargo, token_version, debe_cambiar_password`,
-      [user.id]
-    );
-    const sessionUser = await attachPermissionProfile(pool, updatedUser.rows[0]);
-    setSessionCookie(res, sessionUser);
-
-    await registrarAudit({
-      usuario_id: sessionUser.id,
-      usuario_correo: sessionUser.correo,
-      accion: 'LOGIN_EXITOSO',
-      ip: getClientIp(req)
-    });
-
-    res.json({ user: toPublicUser(sessionUser) });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: 'Error en el servidor.' });
-  }
-});
-
-app.get('/api/auth/me', verifyToken, async (req, res) => {
-  try {
-    res.json({ user: toPublicUser(req.user) });
-  } catch (err) {
-    res.status(500).json({ message: 'Error en el servidor.' });
-  }
-});
-
-app.get('/api/modules', verifyToken, (req, res) => {
-  res.json(getVisibleModuleCatalog(req.user.permissions));
-});
-
-app.post('/api/auth/change-password', verifyToken, async (req, res) => {
-  const { current_password: currentPassword, new_password: newPassword } = req.body;
-  if (!currentPassword || !newPassword) {
-    return res.status(400).json({ message: 'La contraseña actual y la nueva son obligatorias.' });
-  }
-
-  const passwordError = validatePassword(newPassword);
-  if (passwordError) return res.status(400).json({ message: passwordError });
-
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN');
-    const userRes = await client.query('SELECT * FROM usuarios WHERE id = $1 FOR UPDATE', [req.user.id]);
-    if (userRes.rows.length === 0 || !userRes.rows[0].activo) {
-      await client.query('ROLLBACK');
-      return res.status(404).json({ message: 'Usuario no encontrado.' });
-    }
-
-    const user = userRes.rows[0];
-    const currentIsValid = await bcrypt.compare(currentPassword, user.password_hash);
-    if (!currentIsValid) {
-      await client.query('ROLLBACK');
-      return res.status(400).json({ message: 'La contraseña actual no es correcta.' });
-    }
-    if (await bcrypt.compare(newPassword, user.password_hash)) {
-      await client.query('ROLLBACK');
-      return res.status(400).json({ message: 'La nueva contraseña debe ser distinta de la actual.' });
-    }
-
-    const hash = await bcrypt.hash(newPassword, 12);
-    const updated = await client.query(`
-      UPDATE usuarios
-      SET password_hash = $1,
-          debe_cambiar_password = false,
-          password_actualizado_en = CURRENT_TIMESTAMP,
-          token_version = token_version + 1,
-          intentos_fallidos = 0,
-          bloqueado_hasta = NULL
-      WHERE id = $2
-      RETURNING id, correo, rol, nombre, token_version, debe_cambiar_password
-    `, [hash, user.id]);
-
-    await insertarAudit(client, {
-      usuario_id: user.id,
-      usuario_correo: user.correo,
-      accion: 'CAMBIAR_PASSWORD_PROPIA',
-      entidad: 'usuario',
-      entidad_id: user.id,
-      ip: getClientIp(req)
-    });
-    await client.query('COMMIT');
-
-    const sessionUser = await attachPermissionProfile(client, updated.rows[0]);
-    setSessionCookie(res, sessionUser);
-    res.json({ message: 'Contraseña actualizada.', user: toPublicUser(sessionUser) });
-  } catch (err) {
-    await client.query('ROLLBACK').catch(() => {});
-    console.error(err.message);
-    res.status(500).json({ message: 'No fue posible actualizar la contraseña.' });
-  } finally {
-    client.release();
-  }
-});
-
-app.post('/api/auth/logout', async (req, res) => {
-  const token = req.cookies.token;
-  if (token) {
-    try {
-      const decoded = jwt.verify(token, JWT_SECRET);
-      await registrarAudit({
-        usuario_id: decoded.id,
-        usuario_correo: decoded.correo,
-        accion: 'LOGOUT',
-        entidad: 'usuario',
-        entidad_id: decoded.id,
-        ip: getClientIp(req)
-      });
-    } catch {
-      // La cookie se limpia aunque la sesión haya vencido.
-    }
-  }
-  res.clearCookie('token', cookieOptions);
-  res.json({ message: 'Sesión cerrada exitosamente.' });
-});
+app.use('/api', createAuthRouter({
+  pool,
+  loginLimiter,
+  verifyToken,
+  insertarAudit,
+  registrarAudit,
+  getClientIp
+}));
 
 app.use('/api', createCoreRouter({
   pool,
@@ -1558,93 +1342,11 @@ app.delete('/api/users/:id', verifyToken, verifyPermission('users.manage'), asyn
   }
 });
 
-// SYSTEM AUDIT
-app.get('/api/audit', verifyToken, verifyPermission('audit.view'), async (req, res) => {
-  const { accion, usuario_correo, cuenta_id, relacion = 'todas', desde, hasta, page = '1', limit = '20' } = req.query;
-
-  if ((desde && !isIsoDate(desde)) || (hasta && !isIsoDate(hasta))) {
-    return res.status(400).json({ message: 'Las fechas de auditoría no son válidas.' });
-  }
-  if (desde && hasta) {
-    const dateRange = validateDateRange(desde, hasta, { maxDays: 3650 });
-    if (dateRange.error) return res.status(400).json({ message: dateRange.error });
-  }
-  if (!['todas', 'realizada', 'sobre_cuenta'].includes(relacion)) {
-    return res.status(400).json({ message: 'El tipo de actividad solicitado no es válido.' });
-  }
-  if (!cuenta_id && relacion !== 'todas') {
-    return res.status(400).json({ message: 'El filtro de relación requiere una cuenta seleccionada.' });
-  }
-
-  const pageNum = Math.max(1, parseInt(page, 10) || 1);
-  const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
-  const offset = (pageNum - 1) * limitNum;
-
-  const conditions = [];
-  const params = [];
-  let idx = 1;
-  let subject = null;
-  let accountParamIndex = null;
-
-  if (cuenta_id) {
-    const accountId = parseInt(cuenta_id, 10);
-    if (!Number.isInteger(accountId) || accountId <= 0) return res.status(400).json({ message: 'La cuenta indicada no es válida.' });
-    const subjectRes = await pool.query(`
-      SELECT u.id, u.correo, u.nombre, u.cargo, u.rol, u.activo, u.eliminado_en,
-             p.nombre AS profile_name
-      FROM usuarios u
-      LEFT JOIN perfiles_acceso p ON p.codigo = u.rol
-      WHERE u.id = $1
-    `, [accountId]);
-    if (!subjectRes.rows.length) return res.status(404).json({ message: 'La cuenta indicada no existe.' });
-    subject = subjectRes.rows[0];
-    accountParamIndex = idx;
-    if (relacion === 'realizada') {
-      conditions.push(`a.usuario_id = $${idx}`);
-    } else if (relacion === 'sobre_cuenta') {
-      conditions.push(`(a.entidad = 'usuario' AND a.entidad_id = $${idx} AND a.usuario_id IS DISTINCT FROM $${idx})`);
-    } else {
-      conditions.push(`(a.usuario_id = $${idx} OR (a.entidad = 'usuario' AND a.entidad_id = $${idx}))`);
-    }
-    params.push(accountId);
-    idx += 1;
-  }
-
-  if (accion)          { conditions.push(`a.accion = $${idx++}`);                          params.push(accion.trim()); }
-  if (usuario_correo)  { conditions.push(`a.usuario_correo ILIKE $${idx++}`);              params.push(`%${usuario_correo.trim()}%`); }
-  if (desde)           { conditions.push(`a.fecha >= $${idx++}`);                          params.push(desde); }
-  if (hasta)           { conditions.push(`a.fecha < ($${idx++}::date + interval '1 day')`); params.push(hasta); }
-
-  const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-
-  try {
-    const countRes = await pool.query(
-      `SELECT COUNT(*) FROM audit_log a ${whereClause}`,
-      params
-    );
-    const total = parseInt(countRes.rows[0].count, 10);
-
-    const relationshipSelection = accountParamIndex
-      ? `CASE WHEN a.usuario_id = $${accountParamIndex} THEN 'realizada' ELSE 'sobre_cuenta' END`
-      : 'NULL::text';
-    const dataRes = await pool.query(
-      `SELECT a.id, a.usuario_id, a.usuario_correo, u.nombre AS usuario_nombre,
-              a.accion, a.entidad, a.entidad_id, a.detalle, a.ip, a.fecha,
-              ${relationshipSelection} AS relacion_cuenta
-       FROM audit_log a
-       LEFT JOIN usuarios u ON u.id = a.usuario_id
-       ${whereClause}
-       ORDER BY a.fecha DESC
-       LIMIT $${idx++} OFFSET $${idx++}`,
-      [...params, limitNum, offset]
-    );
-
-    res.json({ total, page: pageNum, pages: Math.ceil(total / limitNum) || 1, rows: dataRes.rows, subject });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: 'Error al obtener auditoría.' });
-  }
-});
+app.use('/api', createAuditRouter({
+  pool,
+  verifyToken,
+  verifyPermission
+}));
 
 const ensureBaseData = async (isNewSchema) => {
   await pool.query(`

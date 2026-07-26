@@ -35,7 +35,7 @@ La edición de un perfil devolvía HTTP 500 porque el detalle de auditoría util
 | Capa | Resultado |
 | --- | --- |
 | Sintaxis backend | Aprobada |
-| Pruebas backend | 38 de 38 |
+| Pruebas backend | 52 de 52 |
 | Lint frontend | Aprobado |
 | Build frontend local | Aprobado |
 | Build Docker sin caché | Backend y frontend aprobados |
@@ -45,9 +45,9 @@ La edición de un perfil devolvía HTTP 500 porque el detalle de auditoría util
 | Parseo de scripts PowerShell | 3 de 3 |
 | Docker Compose | Configuración válida |
 | Arranque desde volúmenes vacíos | 4 de 4 servicios saludables |
-| Esquema | Base más migraciones 001 a 008 |
+| Esquema | Base más migraciones 001 a 011 |
 | Cuentas iniciales | Administrador y terminal creados |
-| Integración HTTP autenticada | 78 de 78 comprobaciones |
+| Integración HTTP autenticada | 99 de 99 comprobaciones |
 | Lecturas concurrentes | 200 de 200, sin error |
 | Reinicio y persistencia | Datos, auditoría y documento conservados |
 | Respaldo | Dump, documentos y checksums válidos |
@@ -63,7 +63,7 @@ La edición de un perfil devolvía HTTP 500 porque el detalle de auditoría util
 | Hardening | 4 de 4 servicios con `read_only`, `no-new-privileges` y capacidades reducidas |
 | HTTPS | Redirección 308, TLS y cookie `Secure` aprobados con certificado efímero |
 
-El recorrido HTTP cubrió salud, sesiones, cookie HttpOnly y SameSite Strict, cambio de contraseña, invalidación de token, catálogo modular por perfil, permisos efectivos, perfiles configurables, usuarios, desactivación, eliminación lógica, estudiantes, búsqueda, escaneo, registro, duplicado, corrección, anulación, justificación, PDF, historial, reportes, analítica, alertas, auditoría, rutas retiradas y logout.
+El recorrido HTTP cubrió salud, sesiones, cookie HttpOnly y SameSite Strict, cambio de contraseña, invalidación de token, catálogo modular por perfil, permisos efectivos, perfiles configurables, usuarios, desactivación, eliminación lógica, estudiantes, búsqueda, escaneo, registro, duplicado, corrección, anulación, justificación, PDF, historial, reportes, analítica, alertas, auditoría, rutas retiradas, Alimentación, importación PAE idempotente, alertas restringidas, concurrencia de dos clientes y logout.
 
 El recorrido HTTP está en `scripts/pruebas-integracion.js`. La puerta completa está en `scripts/pruebas-aceptacion.ps1`: crea secretos, certificados y datos ficticios en un entorno temporal, levanta un proyecto Compose aislado, verifica hardening, integración, respaldo, restauración y TLS, y elimina sus contenedores, volúmenes y temporales.
 
@@ -105,5 +105,5 @@ Esto es una comprobación de estabilidad local, no una prueba formal de capacida
 - Puntualidad: preservada y utilizable como módulo base.
 - Fase 3.0: aprobada.
 - Fase 3.1: aprobada.
-- Fase 3.2: iniciada; primera extracción de lectura del núcleo aprobada.
+- Fase 3.2: avanzada; lectura del núcleo, autenticación, sesiones y auditoría ya están separadas y aprobadas.
 - Piloto con datos reales: condicionado a las decisiones y aceptación institucionales anteriores.

@@ -98,7 +98,7 @@ No se copiará como una segunda aplicación completa. Más adelante se trasladar
 - **Fase 2:** completada y validada integralmente.
 - **Hallazgos previos a piloto:** dependencias e imágenes, endurecimiento de contenedores y respuesta CORS, registrados en `docs/VALIDATION_2026-07-26.md`.
 - **Fase 3:** 3.0, 3.1, 3.3, 3.4 y la aceptación automatizada de 3.5 completadas; 3.2 continúa con extracción incremental.
-- **Fase 4:** núcleo de Alimentación implementado y validado; importación PAE, terminal dedicado y reportes completos siguen pendientes.
+- **Fase 4:** flujo previo a hardware completado: núcleo, importación PAE idempotente, lector, alertas restringidas, reportes y concurrencia automatizada. Solo falta aceptación con lector y dos equipos físicos.
 - **Visitas y retiros:** permanece como integración reservada y se desarrolla en una implementación externa.
 
 ## Generalización institucional
@@ -125,4 +125,4 @@ El subproyecto independiente de cuestionarios y los recursos visuales del establ
 
 ## Próximo resultado esperado
 
-Completar la extracción 3.2 sin romper la API y terminar Alimentación con importación PAE, terminal de lector y reportes. Después se repetirá la aceptación integral antes de recibir la implementación externa de Visitas y Retiros.
+Completar la extracción restante de cuentas y escrituras del núcleo sin romper la API. La siguiente puerta institucional es probar el lector y dos equipos físicos; Visitas y Retiros permanece fuera de este repositorio hasta recibir su implementación generalizada.

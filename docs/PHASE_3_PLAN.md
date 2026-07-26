@@ -98,6 +98,13 @@ Primera unidad completada:
 - `server.js` dejó de contener esas consultas SQL.
 - 38 de 38 pruebas backend y 78 de 78 comprobaciones HTTP aprobadas desde volúmenes vacíos.
 
+Unidades adicionales completadas:
+
+- Autenticación, cambio de contraseña, cierre de sesión y catálogo visible operan desde `routes/auth.js`.
+- La consulta de auditoría opera desde `routes/audit.js`.
+- El servicio documental concentra validación binaria, nombres, almacenamiento privado y eliminación segura.
+- Estas extracciones conservaron cookies, permisos, códigos HTTP y payloads en 99 comprobaciones HTTP.
+
 Orden de extracción:
 
 1. Autenticación y sesión.
@@ -232,9 +239,9 @@ Documentos a cerrar:
 
 Resultado automatizado:
 
-- 46 de 46 pruebas backend.
+- 52 de 52 pruebas backend.
 - Lint y build de frontend aprobados.
-- 89 de 89 comprobaciones HTTP desde una instalación efímera.
+- 99 de 99 comprobaciones HTTP desde una instalación efímera.
 - Endurecimiento de cuatro contenedores aprobado.
 - Respaldo, hashes y restauración aislada aprobados.
 - Redirección HTTPS, TLS y cookie `Secure` aprobados.

@@ -83,12 +83,12 @@ Estado: en ejecución; núcleo operacional completado y validado el 26 de julio 
 
 Entregables:
 
-- Beneficiarios. Completado en su flujo manual.
-- Importación PAE.
+- Beneficiarios. Completado en flujo manual e importación PAE.
+- Importación PAE. Completada con previsualización, errores por fila e idempotencia.
 - Servicios de alimentación. Completado.
 - Prevención de duplicados. Completado.
-- Alertas alimentarias mínimas.
-- Terminal y reportes. API y portal inicial completados; terminal de lector y reportes finales pendientes.
+- Alertas alimentarias mínimas. Completadas con permisos restringidos y auditoría.
+- Terminal y reportes. Flujo de lector, selección por franja, filtros y exportación completados; prueba física pendiente.
 - Integración con la línea temporal. Completado.
 
 Salida:

@@ -51,11 +51,11 @@ test('la eliminación de cuentas conserva trazabilidad y no reutiliza la desacti
 });
 
 test('la auditoría permite consultar actividad y cambios de una cuenta específica', () => {
-  const serverSource = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
-  assert.match(serverSource, /cuenta_id/);
-  assert.match(serverSource, /relacion = 'todas'/);
-  assert.match(serverSource, /a\.usuario_id IS DISTINCT FROM/);
-  assert.match(serverSource, /relacion_cuenta/);
-  assert.match(serverSource, /a\.usuario_id/);
-  assert.match(serverSource, /a\.entidad = 'usuario'/);
+  const auditSource = fs.readFileSync(path.join(__dirname, '..', 'routes', 'audit.js'), 'utf8');
+  assert.match(auditSource, /cuenta_id/);
+  assert.match(auditSource, /relacion = 'todas'/);
+  assert.match(auditSource, /a\.usuario_id IS DISTINCT FROM/);
+  assert.match(auditSource, /relacion_cuenta/);
+  assert.match(auditSource, /a\.usuario_id/);
+  assert.match(auditSource, /a\.entidad = 'usuario'/);
 });

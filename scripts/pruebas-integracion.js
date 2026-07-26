@@ -142,7 +142,9 @@ const run = async () => {
   pass('cursos base cargados');
   result = await request('/permissions/catalog', { cookie: adminCookie });
   expectStatus(result, 200, 'catálogo permisos y perfiles');
-  assert.ok(result.data.permissions.length >= 17 && result.data.templates.length >= 5);
+  assert.ok(result.data.permissions.length >= 20 && result.data.templates.length >= 5);
+  assert.ok(result.data.permissions.some(({ codigo }) => codigo === 'food.import'));
+  assert.ok(result.data.permissions.some(({ codigo }) => codigo === 'food.alerts.manage'));
   result = await request('/puntualidad/config', { cookie: adminCookie });
   expectStatus(result, 200, 'lee configuración puntualidad');
 
@@ -446,9 +448,71 @@ const run = async () => {
   expectStatus(result, 200, 'lista servicios de Alimentacion');
   assert.deepEqual(result.data.map(({ code }) => code), ['breakfast', 'lunch', 'snack']);
   const lunchService = result.data.find(({ code }) => code === 'lunch');
+  result = await request('/food/services/current', { cookie: adminCookie });
+  expectStatus(result, 200, 'resuelve servicio actual o siguiente');
+  assert.ok(Object.hasOwn(result.data, 'current') && Object.hasOwn(result.data, 'next'));
   result = await request(`/food/students/search?q=${students[0].rut}`, { cookie: adminCookie });
   expectStatus(result, 200, 'busca estudiante para Alimentacion');
   assert.equal(result.data[0].beneficiario, false);
+  result = await request(`/food/students/scan/${students[0].rut}${students[0].dv}`, { cookie: adminCookie });
+  expectStatus(result, 200, 'lector de Alimentacion resuelve credencial');
+  assert.equal(result.data.id_alumno, studentIds[0]);
+  result = await request(`/food/alerts/${studentIds[0]}`, {
+    method: 'PUT',
+    cookie: adminCookie,
+    body: { active: true, alertText: 'No entregar productos con maní en esta prueba ficticia.' }
+  });
+  expectStatus(result, 200, 'registra alerta alimentaria restringida');
+  result = await request(`/food/students/search?q=${students[0].rut}`, { cookie: adminCookie });
+  expectStatus(result, 200, 'perfil autorizado ve alerta en busqueda');
+  assert.match(result.data[0].alerta_alimentaria, /maní/);
+
+  const paeRows = [
+    { RUT: `${students[1].rut}-${students[1].dv}`, Estado: 'Activo', 'Vigente desde': todayInSantiago() },
+    { RUT: `${students[2].rut}-${students[2].dv}`, Estado: 'Activo', 'Vigente desde': todayInSantiago() }
+  ];
+  result = await request('/food/beneficiaries/import/preview', {
+    method: 'POST',
+    cookie: adminCookie,
+    body: { rows: paeRows }
+  });
+  expectStatus(result, 200, 'previsualiza nomina PAE valida');
+  assert.equal(result.data.valid, 2);
+  const paeHash = result.data.contentHash;
+  result = await request('/food/beneficiaries/import', {
+    method: 'POST',
+    cookie: adminCookie,
+    body: { rows: paeRows, idempotencyKey: paeHash, fileName: 'nomina-ficticia.xlsx' }
+  });
+  expectStatus(result, 201, 'aplica nomina PAE auditada');
+  result = await request('/food/beneficiaries/import', {
+    method: 'POST',
+    cookie: adminCookie,
+    body: { rows: paeRows, idempotencyKey: paeHash, fileName: 'nomina-ficticia.xlsx' }
+  });
+  expectStatus(result, 200, 'reintento de nomina PAE es idempotente');
+  assert.equal(result.data.duplicate, true);
+  result = await request('/food/imports', { cookie: adminCookie });
+  expectStatus(result, 200, 'consulta historial de importaciones PAE');
+  assert.equal(result.data.length, 1);
+  const concurrentDeliveries = await Promise.all([
+    request('/food/registrations', {
+      method: 'POST',
+      cookie: adminCookie,
+      body: { studentId: studentIds[1], serviceId: lunchService.id_service, origin: 'lector' }
+    }),
+    request('/food/registrations', {
+      method: 'POST',
+      cookie: adminCookie,
+      body: { studentId: studentIds[1], serviceId: lunchService.id_service, origin: 'lector' }
+    })
+  ]);
+  assert.deepEqual(
+    concurrentDeliveries.map(({ response }) => response.status).sort(),
+    [201, 409]
+  );
+  pass('dos terminales concurrentes conservan una sola entrega');
+
   result = await request(`/food/beneficiaries/${studentIds[0]}`, {
     method: 'PUT',
     cookie: adminCookie,
@@ -471,7 +535,9 @@ const run = async () => {
   assert.equal(result.data.code, 'DUPLICATE_DELIVERY');
   result = await request(`/food/today?serviceId=${lunchService.id_service}`, { cookie: adminCookie });
   expectStatus(result, 200, 'consulta jornada de Alimentacion');
-  assert.equal(result.data.summary.entregas, 1);
+  assert.equal(result.data.summary.entregas, 2);
+  assert.equal(result.data.registrations.filter(({ id_alumno }) => id_alumno === studentIds[1]).length, 1);
+  assert.equal(result.data.registrations.filter(({ id_alumno }) => id_alumno === studentIds[0]).length, 1);
   result = await request(`/food/registrations/${foodRegistrationId}/void`, {
     method: 'PATCH',
     cookie: adminCookie,
@@ -484,6 +550,12 @@ const run = async () => {
     body: { studentId: studentIds[0], serviceId: lunchService.id_service, origin: 'lector' }
   });
   expectStatus(result, 201, 'permite nueva entrega despues de anulacion');
+  result = await request(`/food/reports?from=${todayInSantiago()}&to=${todayInSantiago()}&serviceId=${lunchService.id_service}`, {
+    cookie: adminCookie
+  });
+  expectStatus(result, 200, 'reporte de Alimentacion filtra periodo y servicio');
+  assert.equal(result.data.total, 3);
+  assert.equal(result.data.summary[0].deliveries, 2);
   result = await request(`/students/${studentIds[0]}/details`, { cookie: adminCookie });
   expectStatus(result, 200, 'ficha operacional reune modulos');
   assert.ok(result.data.linea_temporal.some(({ tipo_evento: type }) => type === 'punctuality.registration.created'));
