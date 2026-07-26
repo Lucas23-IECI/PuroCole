@@ -87,6 +87,15 @@ Resultado verificado:
 
 Resultado esperado: `server.js` deja de concentrar responsabilidades, pero las rutas públicas permanecen compatibles.
 
+Estado: en ejecución desde el 26 de julio de 2026.
+
+Primera unidad completada:
+
+- Consultas de cursos, listado de estudiantes, búsqueda y detalle separadas en router y servicio del núcleo.
+- URLs, permisos, códigos HTTP y payloads preservados.
+- `server.js` dejó de contener esas consultas SQL.
+- 38 de 38 pruebas backend y 78 de 78 comprobaciones HTTP aprobadas desde volúmenes vacíos.
+
 Orden de extracción:
 
 1. Autenticación y sesión.

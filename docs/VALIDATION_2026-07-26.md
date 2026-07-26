@@ -35,7 +35,7 @@ La edición de un perfil devolvía HTTP 500 porque el detalle de auditoría util
 | Capa | Resultado |
 | --- | --- |
 | Sintaxis backend | Aprobada |
-| Pruebas backend | 34 de 34 |
+| Pruebas backend | 38 de 38 |
 | Lint frontend | Aprobado |
 | Build frontend local | Aprobado |
 | Build Docker sin caché | Backend y frontend aprobados |
@@ -105,5 +105,5 @@ Esto es una comprobación de estabilidad local, no una prueba formal de capacida
 - Puntualidad: preservada y utilizable como módulo base.
 - Fase 3.0: aprobada.
 - Fase 3.1: aprobada.
-- Fase 3.2: autorizada para comenzar.
+- Fase 3.2: iniciada; primera extracción de lectura del núcleo aprobada.
 - Piloto con datos reales: condicionado a las decisiones y aceptación institucionales anteriores.

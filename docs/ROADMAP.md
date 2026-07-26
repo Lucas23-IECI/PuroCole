@@ -59,7 +59,7 @@ Salida:
 
 ## Fase 3 — Núcleo modular
 
-Estado: en ejecución; subfases 3.0 y 3.1 completadas. La siguiente unidad es 3.2.
+Estado: en ejecución; subfases 3.0 y 3.1 completadas. La primera extracción de 3.2 está aprobada y continúa el desacople del núcleo.
 
 Plan detallado: `PHASE_3_PLAN.md`.
 

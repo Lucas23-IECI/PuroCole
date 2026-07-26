@@ -21,6 +21,7 @@ const {
 } = require('./utils/security');
 const { calculateStatusAndSeverity } = require('./utils/punctuality');
 const { isIsoDate, validateDateRange } = require('./utils/validation');
+const { createCoreRouter } = require('./routes/core');
 const { createPunctualityRouter } = require('./routes/punctuality');
 const { getVisibleModuleCatalog } = require('./modules/catalog');
 const {
@@ -271,14 +272,6 @@ const normalizeDateInput = (value) => {
 
   return null;
 };
-
-const STUDENT_PUBLIC_FIELDS = `
-  a.id_alumno, a.uuid_erp, a.rut, a.dv, a.nombres, a.paterno, a.materno,
-  a.email, a.telefono, a.rol, a.seccion, a.genero, a.fecha_nacimiento,
-  a.nombre_usuario, a.rut_apoderado, a.activo, a.fecha_actualizacion,
-  a.codigo_barra
-`;
-
 
 const getInstitutionalClock = async (queryable = pool) => {
   const result = await queryable.query("SELECT TO_CHAR(LOCALTIME, 'HH24:MI:SS') AS hora");
@@ -552,15 +545,11 @@ app.post('/api/auth/logout', async (req, res) => {
   res.json({ message: 'Sesión cerrada exitosamente.' });
 });
 
-// COURSES
-app.get('/api/courses', verifyToken, async (req, res) => {
-  try {
-    const resC = await pool.query('SELECT * FROM curso ORDER BY nombre_curso ASC');
-    res.json(resC.rows);
-  } catch (err) {
-    res.status(500).json({ message: 'Error al obtener cursos.' });
-  }
-});
+app.use('/api', createCoreRouter({
+  pool,
+  verifyToken,
+  verifyAnyPermission
+}));
 
 // SUPERFICIE HEREDADA DE ASISTENCIA
 //
@@ -592,52 +581,6 @@ app.all('/api/asistencia/justificacion/:id', verifyToken, legacyAttendanceGone);
 app.all('/api/asistencia/download/:id', verifyToken, legacyAttendanceGone);
 app.put('/api/asistencia/:id', verifyToken, legacyAttendanceGone);
 app.delete('/api/asistencia/:id', verifyToken, legacyAttendanceGone);
-
-// STUDENTS CRUD
-app.get('/api/students', verifyToken, verifyAnyPermission(['students.view', 'students.manage', 'students.import']), async (req, res) => {
-  try {
-    const query = `
-      SELECT ${STUDENT_PUBLIC_FIELDS}, c.nombre_curso as grade
-      FROM alumno a
-      LEFT JOIN matricula m ON a.id_alumno = m.id_alumno
-      LEFT JOIN curso c ON m.id_curso = c.id_curso
-      ORDER BY a.paterno ASC, a.nombres ASC
-    `;
-    const resStudents = await pool.query(query);
-    res.json(resStudents.rows);
-  } catch (err) {
-    res.status(500).json({ message: 'Error al obtener miembros.' });
-  }
-});
-
-app.get('/api/students/search', verifyToken, verifyAnyPermission(['punctuality.register', 'reports.generate', 'students.view', 'students.manage']), async (req, res) => {
-  const { q } = req.query;
-  const searchTerm = `%${(q || '').toString().trim().toLowerCase()}%`;
-
-  try {
-    const query = `
-      SELECT a.id_alumno, a.nombres, a.paterno, a.materno, a.rut, a.dv, a.rol, c.nombre_curso
-      FROM alumno a
-      LEFT JOIN matricula m ON a.id_alumno = m.id_alumno
-      LEFT JOIN curso c ON m.id_curso = c.id_curso
-      WHERE a.activo = true
-        AND (
-          LOWER(a.nombres || ' ' || a.paterno || ' ' || COALESCE(a.materno, '')) LIKE $1
-          OR LOWER(a.rut || '-' || COALESCE(a.dv, '')) LIKE $1
-          OR LOWER(a.rut || COALESCE(a.dv, '')) LIKE $1
-          OR LOWER(COALESCE(a.codigo_barra, '')) LIKE $1
-          OR LOWER(a.rut) LIKE $1
-          OR LOWER(COALESCE(a.nombre_usuario, '')) LIKE $1
-        )
-      LIMIT 15
-    `;
-    const result = await pool.query(query, [searchTerm]);
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: 'Error en búsqueda' });
-  }
-});
 
 app.get('/api/students/scan/:barcode', verifyToken, verifyPermission('punctuality.register'), async (req, res) => {
   const { barcode } = req.params;
@@ -1005,28 +948,6 @@ app.post('/api/students/bulk-sync', verifyToken, verifyPermission('students.impo
     res.status(500).json({ message: 'Error al sincronizar datos del colegio.' });
   } finally {
     client.release();
-  }
-});
-
-// GET SINGLE STUDENT DETAILS
-app.get('/api/students/:id/details', verifyToken, verifyAnyPermission(['students.view', 'students.manage']), async (req, res) => {
-  const { id } = req.params;
-  try {
-    const query = `
-      SELECT ${STUDENT_PUBLIC_FIELDS}, c.nombre_curso as grade
-      FROM alumno a
-      LEFT JOIN matricula m ON a.id_alumno = m.id_alumno
-      LEFT JOIN curso c ON m.id_curso = c.id_curso
-      WHERE a.id_alumno = $1
-    `;
-    const resA = await pool.query(query, [id]);
-    if (resA.rows.length === 0) return res.status(404).json({ message: 'Miembro no encontrado.' });
-
-    res.json({
-      alumno: resA.rows[0]
-    });
-  } catch (err) {
-    res.status(500).json({ message: 'Error al obtener detalles.' });
   }
 });
 
