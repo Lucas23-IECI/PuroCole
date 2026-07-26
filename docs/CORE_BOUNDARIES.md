@@ -8,10 +8,12 @@
 |---|---|---|
 | Sesión y catálogo visible | `routes/auth.js` | Cookie, token, cambio de contraseña y módulos visibles |
 | Lecturas de estudiantes | `routes/core.js` + `services/coreQueryService.js` | Cursos, lista, búsqueda, ficha y línea temporal |
+| Escrituras de estudiantes | `routes/studentAdmin.js` | Altas, ediciones, bajas lógicas, matrícula e importación |
+| Cuentas y perfiles | `routes/accessAdmin.js` | Usuarios, estados, permisos y perfiles configurables |
 | Auditoría consultable | `routes/audit.js` | Filtros, paginación y relación con cuentas |
 | Documento privado | `services/documentService.js` | Firma binaria, tamaño, nombre, hash, ruta y borrado |
 | Eventos operacionales | `services/operationalEventService.js` | Sobre idempotente y línea temporal |
-| Puntualidad | `routes/punctuality.js` | Configuración, ingresos, correcciones, justificaciones y reportes |
+| Puntualidad | `routes/punctuality.js` + `routes/punctualityCompat.js` | Configuración, ingresos, correcciones, justificaciones, reportes y compatibilidad de lectores |
 | Alimentación | `routes/food.js` | Beneficiarios, entregas, PAE, alertas y reportes |
 
 ## Contrato documental congelado
@@ -33,6 +35,6 @@
 - Las rutas no duplican validación binaria de documentos.
 - Visitas y retiros no se incorpora hasta recibir una fuente externa generalizada.
 
-## Extracción pendiente
+## Extracción cerrada
 
-La API sigue estable, pero `server.js` aún contiene escrituras de estudiantes, importación de matrícula y administración de cuentas/perfiles. Esas unidades deben moverse una por una y conservar la batería HTTP sin cambiar expectativas funcionales.
+`server.js` conserva composición, salud, arranque y los alias transitorios de Puntualidad. Las lecturas y escrituras del núcleo, autenticación, sesiones, cuentas, perfiles, permisos, auditoría, documentos y eventos tienen propietarios separados sin cambiar la API pública.

@@ -28,25 +28,25 @@ test('las rutas operacionales exigen permisos y no dependen de roles rígidos', 
 });
 
 test('el servidor consulta perfiles configurables en lugar de roles fijos', () => {
-  const serverSource = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
-  assert.match(serverSource, /getAccessProfiles/);
-  assert.match(serverSource, /\/api\/access-profiles/);
-  assert.doesNotMatch(serverSource, /validateSystemRole/);
-  assert.doesNotMatch(serverSource, /\/api\/access-people/);
+  const accessSource = fs.readFileSync(path.join(__dirname, '..', 'routes', 'accessAdmin.js'), 'utf8');
+  assert.match(accessSource, /getAccessProfiles/);
+  assert.match(accessSource, /\/access-profiles/);
+  assert.doesNotMatch(accessSource, /validateSystemRole/);
+  assert.doesNotMatch(accessSource, /\/access-people/);
 });
 
 test('la edición de perfiles registra la descripción recibida sin una variable inexistente', () => {
-  const serverSource = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
-  assert.match(serverSource, /despues: \{ nombre: name, descripcion: description,/);
-  assert.doesNotMatch(serverSource, /despues: \{ nombre: name, descripcion,/);
+  const accessSource = fs.readFileSync(path.join(__dirname, '..', 'routes', 'accessAdmin.js'), 'utf8');
+  assert.match(accessSource, /despues: \{ nombre: name, descripcion: description,/);
+  assert.doesNotMatch(accessSource, /despues: \{ nombre: name, descripcion,/);
 });
 
 test('la eliminación de cuentas conserva trazabilidad y no reutiliza la desactivación', () => {
-  const serverSource = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
+  const accessSource = fs.readFileSync(path.join(__dirname, '..', 'routes', 'accessAdmin.js'), 'utf8');
   const migrationSource = fs.readFileSync(path.join(__dirname, '..', 'migrations', '008_eliminacion_logica_usuarios.sql'), 'utf8');
-  assert.match(serverSource, /accion: 'ELIMINAR_USUARIO'/);
-  assert.match(serverSource, /eliminado_en = CURRENT_TIMESTAMP/);
-  assert.match(serverSource, /motivo de eliminación de al menos 8 caracteres/);
+  assert.match(accessSource, /accion: 'ELIMINAR_USUARIO'/);
+  assert.match(accessSource, /eliminado_en = CURRENT_TIMESTAMP/);
+  assert.match(accessSource, /motivo de eliminación de al menos 8 caracteres/);
   assert.match(migrationSource, /WHERE eliminado_en IS NULL/);
 });
 

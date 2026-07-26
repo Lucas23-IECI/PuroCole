@@ -89,7 +89,7 @@ Resultado verificado:
 
 Resultado esperado: `server.js` deja de concentrar responsabilidades, pero las rutas públicas permanecen compatibles.
 
-Estado: en ejecución desde el 26 de julio de 2026.
+Estado: completada el 26 de julio de 2026.
 
 Primera unidad completada:
 
@@ -102,6 +102,8 @@ Unidades adicionales completadas:
 
 - Autenticación, cambio de contraseña, cierre de sesión y catálogo visible operan desde `routes/auth.js`.
 - La consulta de auditoría opera desde `routes/audit.js`.
+- Altas, ediciones, bajas e importación de estudiantes y matrículas operan desde `routes/studentAdmin.js`.
+- Cuentas, perfiles y permisos operan desde `routes/accessAdmin.js`.
 - El servicio documental concentra validación binaria, nombres, almacenamiento privado y eliminación segura.
 - Estas extracciones conservaron cookies, permisos, códigos HTTP y payloads en 99 comprobaciones HTTP.
 
@@ -239,7 +241,7 @@ Documentos a cerrar:
 
 Resultado automatizado:
 
-- 52 de 52 pruebas backend.
+- 53 de 53 pruebas backend.
 - Lint y build de frontend aprobados.
 - 99 de 99 comprobaciones HTTP desde una instalación efímera.
 - Endurecimiento de cuatro contenedores aprobado.

@@ -59,7 +59,7 @@ Salida:
 
 ## Fase 3 — Núcleo modular
 
-Estado: en ejecución; 3.0, 3.1, 3.3, 3.4 y la aceptación automatizada de 3.5 están completadas. La extracción incremental 3.2 continúa.
+Estado: completada en software el 26 de julio de 2026. La aceptación física forma parte de la preparación del piloto.
 
 Plan detallado: `PHASE_3_PLAN.md`.
 
@@ -79,7 +79,7 @@ Salida:
 
 ## Fase 4 — Alimentación
 
-Estado: en ejecución; núcleo operacional completado y validado el 26 de julio de 2026.
+Estado: completada en software y validada el 26 de julio de 2026; aceptación física pendiente.
 
 Entregables:
 

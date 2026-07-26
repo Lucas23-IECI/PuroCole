@@ -35,13 +35,13 @@ La edición de un perfil devolvía HTTP 500 porque el detalle de auditoría util
 | Capa | Resultado |
 | --- | --- |
 | Sintaxis backend | Aprobada |
-| Pruebas backend | 52 de 52 |
+| Pruebas backend | 53 de 53 |
 | Lint frontend | Aprobado |
 | Build frontend local | Aprobado |
 | Build Docker sin caché | Backend y frontend aprobados |
 | Auditoría npm de producción backend | 0 vulnerabilidades |
 | Dependencias frontend | React Router actualizado a 7.18.1; excepción RSC no alcanzable documentada en `SECURITY_EXCEPTIONS.md` |
-| Imágenes finales con Docker Scout | Backend, PostgreSQL y frontend: 0 críticas y 0 altas |
+| Imágenes finales con Docker Scout | Backend, PostgreSQL, frontend y respaldo: 0 críticas y 0 altas |
 | Parseo de scripts PowerShell | 3 de 3 |
 | Docker Compose | Configuración válida |
 | Arranque desde volúmenes vacíos | 4 de 4 servicios saludables |
@@ -105,5 +105,5 @@ Esto es una comprobación de estabilidad local, no una prueba formal de capacida
 - Puntualidad: preservada y utilizable como módulo base.
 - Fase 3.0: aprobada.
 - Fase 3.1: aprobada.
-- Fase 3.2: avanzada; lectura del núcleo, autenticación, sesiones y auditoría ya están separadas y aprobadas.
+- Fase 3.2: aprobada; lecturas y escrituras del núcleo, autenticación, sesiones, cuentas, perfiles, permisos y auditoría están separadas.
 - Piloto con datos reales: condicionado a las decisiones y aceptación institucionales anteriores.

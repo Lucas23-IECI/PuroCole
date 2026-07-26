@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const serverSource = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
+const compatibilitySource = fs.readFileSync(path.join(__dirname, '..', 'routes', 'punctualityCompat.js'), 'utf8');
 
 const retiredRoutes = [
   '/api/attendance/config',
@@ -32,8 +33,9 @@ test('no recompila calculos ni mutaciones de ausencias', () => {
 });
 
 test('mantiene un unico alias transitorio para registrar ingresos', () => {
-  assert.equal(serverSource.split("app.post('/api/asistencia'").length - 1, 1);
-  assert.match(serverSource, /endpoint_legacy: true/);
+  assert.equal(compatibilitySource.split("router.post('/asistencia'").length - 1, 1);
+  assert.match(compatibilitySource, /endpoint_legacy: true/);
+  assert.match(serverSource, /createPunctualityCompatRouter/);
 });
 
 test('las cuentas iniciales respetan el indice parcial de correos activos', () => {
